@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# This script registers the node with a CleverNIM installation
+# If the node already exists, node information is updated, otherwise it is created
+
+# Serial number is our primary key
+SERIAL=`/usr/sbin/dmidecode -s chassis-serial-number`
+if [ "$SERIAL" == "" -o "$SERIAL" == "Not Specified" ]; then
+	SERIAL=`/usr/sbin/dmidecode -s system-uuid`
+fi
+if [ "$SERIAL" == "" ]; then
+	SERIAL="INCONNU"
+fi
+# Puppet certificate name for matching the node with information from PuppetDB
+PUPPET=`/bin/cat /etc/puppet/puppet.conf | /bin/grep certname | /usr/bin/cut -d'"' -f2`
+if [ "$PUPPET" == "" ]; then
+	PUPPET="INCONNU"
+fi
+# Hostname
+HOST=`/bin/hostname -s`
+if [ "$HOST" == "" ]; then
+	echo "Erreur: impossible de récupérer le hostname"
+	exit 1
+fi
+# Site
+ECOLE=`/usr/bin/facter -p ecole`
+if [ "$ECOLE" == "" ]; then
+	ECOLE="UNKNOWN"
+fi
+# Router
+ROUTEUR=`/sbin/route -n | /bin/grep ^0.0.0.0 | /usr/bin/awk '{ print $2; }'`
+if [ "$ROUTEUR" == "" ]; then
+	ROUTEUR="UNKNOWN"
+fi
+# REST Web Service call to CleverNIM
+/usr/bin/curl -f -H "X_REQUESTED_WITH:XMLHttpRequest" "<%= @server %>/poste/addPoste" -d nom=$HOST -d ecole=$ECOLE -d puppet=$PUPPET -d serial=$SERIAL -d routeur=$ROUTEUR

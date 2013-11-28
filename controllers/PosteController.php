@@ -274,8 +274,7 @@ class PosteController extends Controller {
 		header('Content-type: application/json; charset=UTF-8'); /* TODO fonctionne pas */
 		$this->layout = false;
 		/* Il faut que la requête soit Ajax, POST et que nom, serial, routeur et puppet (éventuellement vide) soient définis */
-		if (Yii::app()->request->isAjaxRequest &&
-			Yii::app()->request->isPostRequest &&
+		if (Yii::app()->request->isPostRequest &&
 			isset($_POST['nom']) &&
 			isset($_POST['serial']) &&
 			isset($_POST['routeur']) &&
@@ -283,13 +282,13 @@ class PosteController extends Controller {
 			($_POST['routeur'] != "") &&
 			($_POST['serial'] != "") &&
 			($_POST['serial'] != "INCONNU")) {
-			/* On vérifie la validité du nom du poste */
-			$erreur = $this->checkName($_POST['nom'], $_POST['routeur']);
+			/* On vérifie la validité du nom du poste TODO Vérifier pourquoi c'est toujours là, on avait fait des validators */
+			/*$erreur = $this->checkName($_POST['nom'], $_POST['routeur']);
 			if ($erreur !== "") {
 				//echo CJSON::encode(CJSON::unicodeToUTF8(array('erreur' => $erreur)));
 				echo CJSON::encode(array('erreur' => $erreur));
 				return;
-			}
+			}*/
 			/* On a un numéro de série, on check si on a une machine correspondante */
 			$poste = Poste::model()->findByAttributes(array('numero_de_serie' => $_POST['serial']));
 			if (!$poste) { /* Le poste n'existe pas, on le crée */

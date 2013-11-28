@@ -75,7 +75,7 @@ class Poste extends EZActiveRecord {
 			array('hostname', 'type', 'type' => 'string'),
 			array('hostname', 'required'),
 			array('hostname', 'unique', 'on' => 'create,import'),
-			array('hostname', 'ext.validators.nommageSEMNom'),
+			//array('hostname', 'ext.validators.nommageSEMNom'),
 			array('nom_puppet', 'type', 'type' => 'string'),
 			array('nom_puppet', 'unique', 'on' => 'create,import'),
 			array('nom_puppet', 'length', 'max' => 255),
@@ -87,7 +87,7 @@ class Poste extends EZActiveRecord {
 			array('numero_de_serie', 'length', 'max' => 255),
 			array('routeur', 'type', 'type' => 'string'),
 			array('routeur', 'required', 'on' => 'create'),
-			array('routeur', 'ext.validators.nommageSEMRouteur'),
+			//array('routeur', 'ext.validators.nommageSEMRouteur'),
 			array('creation', 'date', 'message' => '{attribute} is not a valid date!', 'format' => 'yyyy-MM-dd H:m:s'),
 			array('creation', 'required'),
 			array('contact', 'date', 'message' => '{attribute} is not a valid date!', 'format' => 'yyyy-MM-dd H:m:s', 'allowEmpty' => true),
@@ -109,11 +109,12 @@ class Poste extends EZActiveRecord {
 
 	public function getOSIcon() {
 		switch ($this->getFact("operatingsystem")) {
-			case "Ubuntu": return "1381414539_start-here-ubuntuoriginal.png"; break;
-			case "Linux": return "1381413220_Linux.png"; break;
-			case "Windows": return "1381413289_32-windows8.png"; break;
-			case "Mac": return "1381413316_snow_leopard.png"; break;
-			default: return "1381413446_help.png"; break;
+			case "Debian": return "debian.png"; break;
+			case "Ubuntu": return "ubuntu.png"; break;
+			case "Linux": return "linux.png"; break;
+			case "Windows": return "windows.png"; break;
+			case "Mac": return "mac.png"; break;
+			default: return "question.png"; break;
 		}
 	}
 
@@ -145,7 +146,7 @@ class Poste extends EZActiveRecord {
 			if (in_array($factname, explode(',', Yii::app()->user->getState('extraCols')))) {
 				$res[] = array(
 						'name' => "searchpuppetfacts[$factname]",
-						'header' => "$factname" . '<a href="javascript:$.fn.yiiGridView.update(\'poste-grid\', { data:{ delCol: \'' . $factname . '\' } });"><img src=\'/images/cross.png\' alt=\'Supprimer la colonne\'/></a>',
+						'header' => "$factname" . '<a href="javascript:$.fn.yiiGridView.update(\'poste-grid\', { data:{ delCol: \'' . $factname . '\' } });"><i class="icon-remove-sign"></i>',
 						'filter' => null,
 						'type' => 'raw',
 						'value' => "\$data->getFact('$factname');"

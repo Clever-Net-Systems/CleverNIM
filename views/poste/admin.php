@@ -12,7 +12,7 @@ $this->breadcrumbs = array(
 	'selectableRows' => 2,
 	'filter' => $poste,
 	'emptyText' => Yii::t('app', 'Pas de résultats'),
-	'summaryText' => Yii::t('app', 'Resultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/poste/export"><img src="/images/csv-16.png" alt="CSV Icon"></a>'),
+	'summaryText' => Yii::t('app', 'Resultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/poste/export"><img src="/images/csv.png" alt="CSV Icon"></a>'),
 	'pager' => array('class' => 'bootstrap.widgets.TbPager', 'prevPageLabel' => Yii::t('app', '< Précédent'), 'nextPageLabel' => Yii::t('app', 'Suivant >')),
 	'columns' => array_merge(array(
 		array(
@@ -100,14 +100,14 @@ $this->breadcrumbs = array(
 			'template' => '{vnc}{kick}{update}{del}',
 			'buttons' => array(
 				'vnc' => array (
-					'label' => Yii::t('app', 'VNC'),
+					'label' => Yii::t('app', '<i class="icon-eye-open"></i>'),
 					'url' => 'Yii::app()->createUrl("poste/vnc", array("id" => $data->id, "prevUri" => Yii::app()->request->requestUri))',
-					'imageUrl' => Yii::app()->request->baseUrl . '/images/vnc.png',
+					'options' => array('data-original-title' => 'VNC', 'title' => 'VNC'),
 				),
 				'kick' => array (
-					'label' => Yii::t('app', 'Kick'),
+					'label' => Yii::t('app', '<i class="icon-bookmark"></i>'),
 					'url' => 'Yii::app()->createUrl("poste/kick", array("id" => $data->id, "prevUri" => Yii::app()->request->requestUri))',
-					'imageUrl' => Yii::app()->request->baseUrl . '/images/lightning.png',
+					'options' => array('data-original-title' => 'Set environment', 'title' => 'Set environment'),
 				),
 				'update' => array (
 					'label' => Yii::t('app', 'Edition'),
