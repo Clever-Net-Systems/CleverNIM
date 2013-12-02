@@ -20,7 +20,6 @@ return array(
 		'application.modules.ezdesigner.models.*', // Needed for audit trail
 		'application.modules.auditTrail.models.AuditTrail',
 		'application.extensions.yiidebugtb.*',
-		'application.extensions.elFinder',
 		'application.extensions.simpleWorkflow.*',
 		'application.modules.translate.TranslateModule',
 		'application.widgets.CRecapForm',

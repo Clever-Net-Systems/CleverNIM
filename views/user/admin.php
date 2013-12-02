@@ -13,7 +13,7 @@ $this->breadcrumbs=array(
 	'afterAjaxUpdate' => 'function() { $(".editable").editable(); }',
 	'filter'=>$model,
 	'emptyText' => 'Pas de résultats',
-	'summaryText' => 'Resultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/user/export"><img src="/images/csv-16.png" alt="CSV Icon"></a>',
+	'summaryText' => 'Resultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/user/export"><img src="/images/csv.png" alt="CSV Icon"></a>',
 	'pager' => array('class' => 'bootstrap.widgets.TbPager', 'prevPageLabel' => Yii::t('app', '< Précédent'), 'nextPageLabel' => Yii::t('app', 'Suivant >')),
 	'columns'=>array(
 		array(

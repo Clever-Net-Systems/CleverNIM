@@ -28,9 +28,22 @@ node default {
 	}
 }
 
-Your nodes should start to appear in your CleverNIM Web interface.
+Your nodes should start to appear in your CleverNIM Web interface (the default admin login is "admin" with password "password").
+
+* Create the following script as /etc/puppet/clevernim and chmod it to 755 (replace "http://clevernim.example.com" with the URL of your Clevernim instance):
+#!/bin/bash
+/usr/bin/curl -d certname=$1 http://clevernim.example.com/tag/ENC
+
+* Add the following lines to your puppet.conf in the [master] section and restart Puppet:
+node_terminus = exec
+external_nodes = /etc/puppet/clevernim
+
+You should now be able to assign tags to nodes via the Web interface.
 
 OPTIONAL ELEMENTS
 -----------------
 
+* To get thumbnail generation in the Media Manager, you need to install php5-imagick
 
+* To get OLAP data analysis on your nodes' facts, copy the folders saiku/ and saiku-ui/ to your Tomcat 7 webapps folder and point the URL in views/bi/olap.php to your Tomcat instance.
+Modify saiku/WEB-INF/classes/saiku-datasources/mondrian and point the DB connection URL to your Clevernim MySQL instance

@@ -13,7 +13,7 @@ $this->breadcrumbs = array(
 	'selectableRows' => 2,
 	'filter' => $tagauto,
 	'emptyText' => Yii::t('app', 'Pas de résultats'),
-	'summaryText' => Yii::t('app', 'Résultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/tagauto/export"><img src="/images/csv-16.png" alt="CSV Icon"></a.'),
+	'summaryText' => Yii::t('app', 'Résultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/tagauto/export"><img src="/images/csv.png" alt="CSV Icon"></a.'),
 	'pager' => array('class' => 'bootstrap.widgets.TbPager', 'prevPageLabel' => Yii::t('app', '< Précédent'), 'nextPageLabel' => Yii::t('app', 'Suivant >')),
 	'columns' => array(
 		array(

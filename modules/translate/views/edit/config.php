@@ -7,17 +7,6 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php
-$this->widget('application.widgets.eguiders.EGuider', array(
-	'id'            => 'i18n',
-	'title'         => 'i18n Configuration',
-	'description'   => $this->renderPartial('application.ezviews.site.eguiders.i18n', null, true),
-	'attachTo'      => '#ConfigForm_langselect',
-	'position'      => 3,
-	'overlay'       => false,
-	'xButton'       => true,
-	'show'          => true
-)); ?>
 <div class="clear"></div>
 <div class="grid_16 widget first">
 	<div class="widget_title clearfix"><h2><?php echo Yii::t('app', 'i18n Configuration'); ?></h2></div>

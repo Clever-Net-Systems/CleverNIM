@@ -11,16 +11,6 @@ jQuery().ready(function (){
 });
 ");
 
-$this->widget('application.widgets.eguiders.EGuider', array(
-	'id'            => 'required_fields',
-	'title'         => 'Required fields',
-	'description'   => $this->renderPartial('application.views.site.eguiders.required_fields', null, true),
-	'attachTo'      => 'label.required',
-	'position'      => 3,
-	'overlay'       => false,
-	'xButton'       => true,
-	'show'          => false
-));
 ?>
 <?php $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'typetag-form',

@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<Schema name="Hardware">
+  <Cube name="BIOS" defaultMeasure="Node">
+    <Table name="dwh_f_node" />
+    <Dimension name="Host" foreignKey="host_id">
+      <Hierarchy hasAll="true" allMemberName="All hosts" primaryKey="id" defaultMember="All hosts">
+        <Table name="dwh_d_host"/>
+        <Level name="TypeEcole" column="typeecole" uniqueMembers="true" />
+        <Level name="Ecole" column="ecole" uniqueMembers="true" />
+        <Level name="Host" column="certname" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Routeur" foreignKey="routeur_id">
+      <Hierarchy hasAll="true" allMemberName="Tous les routeurs" primaryKey="id" defaultMember="Tous les routeurs">
+        <Table name="dwh_d_routeur"/>
+        <Level name="Routeur" column="routeur" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="BIOS Vendor" foreignKey="bios_vendor_id">
+      <Hierarchy hasAll="true" allMemberName="All BIOS vendors" primaryKey="id" defaultMember="All BIOS vendors">
+        <Table name="dwh_d_bios_vendor"/>
+        <Level name="Vendor" column="vendor" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="BIOS Version" foreignKey="bios_version_id">
+      <Hierarchy hasAll="true" allMemberName="All BIOS versions" primaryKey="id" defaultMember="All BIOS versions">
+        <Table name="dwh_d_bios_version"/>
+        <Level name="Version" column="version" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="BIOS Release Date" foreignKey="bios_release_date_id">
+      <Hierarchy hasAll="true" allMemberName="All BIOS release dates" primaryKey="id" defaultMember="All BIOS release dates">
+        <Table name="dwh_d_bios_release_date"/>
+        <Level name="Release date" column="release_date" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Interface Speed" foreignKey="ifspeed_eth0_id">
+      <Hierarchy hasAll="true" allMemberName="All interface speeds" primaryKey="id" defaultMember="All interface speeds">
+        <Table name="dwh_d_ifspeed_eth0"/>
+        <Level name="Interface speed" column="speed" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Screen1 Manufacturer" foreignKey="manufacturer_screen1_id">
+      <Hierarchy hasAll="true" allMemberName="All screen1 manufacturers" primaryKey="id" defaultMember="All screen1 manufacturers">
+        <Table name="dwh_d_manufacturer_screen1"/>
+        <Level name="Screen1 manufacturer" column="manufacturer" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Environnement" foreignKey="env_id">
+      <Hierarchy hasAll="true" allMemberName="Tous les environnements" primaryKey="id" defaultMember="Tous les environnements">
+        <Table name="dwh_d_env"/>
+        <Level name="Environnement" column="env" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="OS Family" foreignKey="osfamily_id">
+      <Hierarchy hasAll="true" allMemberName="All OS families" primaryKey="id" defaultMember="All OS families">
+        <Table name="dwh_d_osfamily"/>
+        <Level name="OS Family" column="osfamily" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Screens" foreignKey="screens_id">
+      <Hierarchy hasAll="true" allMemberName="All screen counts" primaryKey="id" defaultMember="All screen counts">
+        <Table name="dwh_d_screens"/>
+        <Level name="Screen count" column="screens" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Regroupement" foreignKey="regroupement_id">
+      <Hierarchy hasAll="true" allMemberName="Tous les regroupements" primaryKey="id" defaultMember="Tous les regroupements">
+        <Table name="dwh_d_regroupement"/>
+        <Level name="Regroupement" column="regroupement" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Version Config SEM" foreignKey="semconfigversions_id">
+      <Hierarchy hasAll="true" allMemberName="Toutes les configs SEM" primaryKey="id" defaultMember="Toutes les configs SEM">
+        <Table name="dwh_d_semconfigversions"/>
+        <Level name="Type" column="type" uniqueMembers="true" />
+        <Level name="Majeure" column="majeure" uniqueMembers="true" />
+        <Level name="Mineure" column="mineure" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Product" foreignKey="product_id">
+      <Hierarchy hasAll="true" allMemberName="All products" primaryKey="id" defaultMember="All products">
+        <Table name="dwh_d_product"/>
+        <Level name="Manufacturer" column="manufacturer" uniqueMembers="true" />
+        <Level name="Type" column="type" uniqueMembers="true" />
+        <Level name="Name" column="name" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Measure name="Node" column="id" aggregator="count" formatString="#,###" caption="Node" />
+    <Measure name="Memory" column="memorysize" aggregator="sum" formatString="#,###" caption="Memory size" />
+    <Measure name="Uptime" column="uptime" aggregator="avg" formatString="#,###" caption="Uptime" />
+  </Cube>
+</Schema>

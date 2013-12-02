@@ -1,11 +1,20 @@
 <?php
 
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../elFinder/php/elFinderConnector.class.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../elFinder/php/elFinder.class.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../elFinder/php/elFinderVolumeDriver.class.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../elFinder/php/elFinderVolumeLocalFileSystem.class.php';
+// Required for MySQL storage connector
+// include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeMySQL.class.php';
+// Required for FTP connector support
+// include_once dirname(__FILE__).DIRECTORY_SEPARATOR.'elFinderVolumeFTP.class.php';
+
 class MediaManagerController extends Controller {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
 	 */
-	public $layout = 'application.views.layouts.cchome';
+	public $layout = "application.views.layouts.bootstrap";
 
 	/**
 	 * jqueryfileupload backend
@@ -28,6 +37,7 @@ class MediaManagerController extends Controller {
 	private $elFinderOpts = array(
 		'root'         => '',           // Will be filled in upon instanciation
 		'URL'          => '',           // Will be filled in upon instanciation
+		'id'           => 'id',
 		'rootAlias'    => 'Media',      // display this instead of root directory name
 		'disabled'     => array(),      // list of not allowed commands
 		'dotFiles'     => false,        // display dot files
@@ -95,13 +105,13 @@ class MediaManagerController extends Controller {
 	/**
 	 * Static class method for retrieveing thumbnail name
 	 */
-	static public function getTmb($file) {
+/*	static public function getTmb($file) {
 		$file = substr($file, 6);
 		if ($file && ($file[0] == '/')) {
 			$file = substr($file, 1);
 		}
 		return md5(Yii::app()->basePath . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR . $file) . '.png';
-	}
+}*/
 
 	/**
 	 * Thumbnail finder for FileTree
@@ -109,10 +119,18 @@ class MediaManagerController extends Controller {
 	public function actionGetTmb() {
 		if (Yii::app()->request->isAjaxRequest && isset($_POST['file'])) {
 			$file = $_POST['file'];
-			if ($file && ($file[0] == '/')) {
+			/* New version */
+			$ts = filemtime(Yii::app()->basePath . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR . $file);
+			$file = substr($file, 1);
+			$hash = strtr(base64_encode($file), '+/=', '-_.');
+			$hash = rtrim($hash, '.');
+			echo "l1_" . $hash . $ts . '.png';
+			/* _relpath = substr("/home/jerome/CleverNIM/media/Tag Icons/photo.jpg", strlen(/home/jerome/CleverNIM/media) + 1) */
+			/* Old version */
+			/*if ($file && ($file[0] == '/')) {
 				$file = substr($file, 1);
 			}
-			echo md5(Yii::app()->basePath . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR . $file) . '.png';
+			echo md5(Yii::app()->basePath . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR . $file) . '.png';*/
 			Yii::app()->end();
 		} else {
 			throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
@@ -120,12 +138,35 @@ class MediaManagerController extends Controller {
 	}
 
 	/**
+	 * Simple function to demonstrate how to control file access using "accessControl" callback.
+	 * This method will disable accessing files/folders starting from  '.' (dot)
+	 *
+	 * @param  string  $attr  attribute name (read|write|locked|hidden)
+	 * @param  string  $path  file path relative to volume root directory started with directory separator
+	 * @return bool|null
+	 **/
+	private function access($attr, $path, $data, $volume) {
+		return strpos(basename($path), '.') === 0       // if file/folder begins with '.' (dot)
+			? !($attr == 'read' || $attr == 'write')    // set read+write to false, other (locked+hidden) set to true
+			:  null;                                    // else elFinder decide it itself
+	}
+
+	/**
 	 * elFinder backend connector
 	 */
 	public function actionMmconnector() {
-		$this->elFinderOpts['root'] = Yii::app()->basePath . DIRECTORY_SEPARATOR . "media";
-		$this->elFinderOpts['URL'] = Yii::app()->createAbsoluteUrl("media") . "/";
-		$fm = new elFinder($this->elFinderOpts);
+		$opts = array(
+			'debug' => true,
+			'roots' => array(
+				array(
+					'driver'        => 'LocalFileSystem',   // driver for accessing file system (REQUIRED)
+					'path'          => dirname(__FILE__) . DIRECTORY_SEPARATOR . '/../media/',         // path to files (REQUIRED)
+					'URL'           => '/media/', // URL to files (REQUIRED)
+					//'accessControl' => '$this->access'             // disable and hide dot starting files (OPTIONAL)
+				)
+			)
+		);
+		$fm = new elFinderConnector(new elFinder($opts));
 		$fm->run();
 	}
 

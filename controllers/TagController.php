@@ -31,8 +31,6 @@ class TagController extends Controller {
 				yiilog("Poste non trouve: " . $_POST['certname']);
 				return;
 			}
-			/* Securite temporaire pendant deploiement */
-			return;
 			/* Récupération des facts du poste */
 			$factsarray = $poste->getFacts();
 			foreach ($factsarray as $elem) {
@@ -58,51 +56,43 @@ class TagController extends Controller {
 //				$facts = yaml_parse($cres);
 //				$facts = $facts['values'];
 //			}
-			/* Sécurité pendant dev, on ne renvoie rien pour la production */
-			if (isset($facts['environnement'])) {
-				yiilog($facts['environnement']);
-			} else {
-				yiilog("Fact environnement indéfini");
-			}
-			if (isset($facts['environnement']) && (($facts['environnement'] == 'dev') || ($facts['environnement'] == 'valid'))) {
-				/* Gestion des tags manuels */
-				foreach($poste->tags as $tag) {
-					if ($tag->groupement->check($facts)) {
-						$ttag = array();
-						//echo "  " . $tag->type_de_tag->classe . ":\n";
-						foreach ($tag->valeurs as $valeurparam) {
-							//echo "    " . $valeurparam->parametre->nom . ": " . $valeurparam->valeur . "\n";
-							if ($valeurparam->parametre->type == 2) {
-								$possibles = explode(',', $valeurparam->parametre->possibles);
-								$ttag[$valeurparam->parametre->nom] = $possibles[$valeurparam->valeur];
-							} else {
-								$ttag[$valeurparam->parametre->nom] = $valeurparam->valeur;
-							}
-						}
-						if ($tag->type_de_tag->classe === "imprimante") { /* Cas spécial d'une imprimante, on regroupe tout sous le tag imprimantes */
-							$yaml['imprimantes'][$ttag['name']] = $ttag;
+			/* Gestion des tags manuels */
+			foreach($poste->tags as $tag) {
+				if ($tag->groupement->check($facts)) {
+					$ttag = array();
+					//echo "  " . $tag->type_de_tag->classe . ":\n";
+					foreach ($tag->valeurs as $valeurparam) {
+						//echo "    " . $valeurparam->parametre->nom . ": " . $valeurparam->valeur . "\n";
+						if ($valeurparam->parametre->type == 2) {
+							$possibles = explode(',', $valeurparam->parametre->possibles);
+							$ttag[$valeurparam->parametre->nom] = $possibles[$valeurparam->valeur];
 						} else {
-							$yaml['classes'][$tag->type_de_tag->classe] = $ttag;
+							$ttag[$valeurparam->parametre->nom] = $valeurparam->valeur;
 						}
 					}
+					if ($tag->type_de_tag->classe === "imprimante") { /* Cas spécial d'une imprimante, on regroupe tout sous le tag imprimantes */
+						$yaml['imprimantes'][$ttag['name']] = $ttag;
+					} else {
+						$yaml['classes'][$tag->type_de_tag->classe] = $ttag;
+					}
 				}
-				/* Gestion des tags automatiques */
-				$tagautos = Tagauto::model()->findAll();
-				foreach ($tagautos as $tagauto) {
-					if ($tagauto->groupement->check($facts)) {
-						$factok = true;
-						$factnb = 0;
-						foreach ($tagauto->faits as $fait) {
-							if (!array_key_exists($fait->fact, $facts) || (!$fait->checkValue($facts[$fait->fact]))) {
-								$factok = false;
-							} else {
-								$factnb++;
-							}
+			}
+			/* Gestion des tags automatiques */
+			$tagautos = Tagauto::model()->findAll();
+			foreach ($tagautos as $tagauto) {
+				if ($tagauto->groupement->check($facts)) {
+					$factok = true;
+					$factnb = 0;
+					foreach ($tagauto->faits as $fait) {
+						if (!array_key_exists($fait->fact, $facts) || (!$fait->checkValue($facts[$fait->fact]))) {
+							$factok = false;
+						} else {
+							$factnb++;
 						}
-						if ($factok && ($factnb > 0)) {
-							//echo "  " . $tagauto->classe . ":\n";
-							$yaml['classes'][$tagauto->classe] = null;
-						}
+					}
+					if ($factok && ($factnb > 0)) {
+						//echo "  " . $tagauto->classe . ":\n";
+						$yaml['classes'][$tagauto->classe] = null;
 					}
 				}
 			}

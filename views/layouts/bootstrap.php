@@ -93,6 +93,7 @@
 								array('label' => 'Logs', 'url' => '/auditTrail/auditAdmin'),
 								'---',
 								array('label' => 'Outils'),
+								array('label' => 'Media Manager', 'url' => '/mediaManager/'),
 								array('label' => 'Regeneration inventaire', 'url' => '/inventaire/generate'),
 								array('label' => 'Regeneration datawarehouse', 'url' => '/bi/generate'),
 								array('label' => 'Redémarrage Apache', 'url' => '/site/restartapache'),

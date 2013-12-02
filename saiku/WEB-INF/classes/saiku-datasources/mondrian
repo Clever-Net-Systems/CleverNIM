@@ -1,0 +1,8 @@
+# Mondrian on MySQL
+# ----------------------------------------------
+type=OLAP
+name=clevernim
+driver=mondrian.olap4j.MondrianOlap4jDriver
+location=jdbc:mondrian:Jdbc=jdbc:mysql://localhost/clevernim;Catalog=res:CleverNIM.xml;JdbcDrivers=com.mysql.jdbc.Driver;
+username=clevernim
+password=clevernim
