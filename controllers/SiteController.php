@@ -126,7 +126,7 @@ class SiteController extends Controller {
 			require(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'extensions' . DIRECTORY_SEPARATOR . 'Solarium' . DIRECTORY_SEPARATOR . 'Autoloader.php');
 			Solarium_Autoloader::register();
 			/* TODO Move client configuration options to common.php */
-			$solclient = new Solarium_Client(array('adapteroptions' => array('host' => 'trax.ceti.etat-ge.ch', 'port' => 8983, 'path' => '/solr/collection1/')));
+			$solclient = new Solarium_Client(array('adapteroptions' => array('host' => 'localhost', 'port' => 8080, 'path' => '/solr/collection1/')));
 			$ping = $solclient->createPing();
 			$error = "";
 			try {
@@ -148,13 +148,6 @@ class SiteController extends Controller {
 					$certname = $result['certname'];
 					$model = Poste::model()->findByAttributes(array('nom_puppet' => $certname));
 					$objlist[] = array('score' => $result['score'], 'model' => $model ? $model : ($certname . " (non reference dans Edupostes)"));
-					/*if (!$model) {
-						Yii::app()->user->setFlash('error', "There was an error retrieving host $certname. Is your search index up to date ?");
-						$this->render('application.views.site.search', array('q' => $q, 'objlist' => $objlist));
-						return;
-					} else {
-						$objlist[] = array('score' => $result['score'], 'model' => $model);
-					}*/
 				}
 			}
 		}
@@ -201,14 +194,14 @@ class SiteController extends Controller {
 		}
 		$model = new SearchOptionsForm;
 		if (isset($_POST['yt1']) && ($_POST['yt1'] === "Reindex search database")) {
-			$creq = "http://trax.ceti.etat-ge.ch:8983/solr/collection1/dataimport?command=reload-config";
+			$creq = "http://localhost:8080/solr/collection1/dataimport?command=reload-config";
 			$csess = curl_init($creq);
 			curl_setopt($csess, CURLOPT_HEADER, true);
 			curl_setopt($csess, CURLOPT_RETURNTRANSFER, true);
 			$cres = curl_exec($csess);
 			curl_close($csess);
 			if (preg_match('/HTTP\/1.1 200 OK/', $cres)) {
-				$creq = "http://trax.ceti.etat-ge.ch:8983/solr/collection1/dataimport?command=full-import";
+				$creq = "http://localhost:8080/solr/collection1/dataimport?command=full-import";
 				$csess = curl_init($creq);
 				curl_setopt($csess, CURLOPT_HEADER, true);
 				curl_setopt($csess, CURLOPT_RETURNTRANSFER, true);
@@ -220,7 +213,7 @@ class SiteController extends Controller {
 					Yii::app()->user->setFlash('error', "Error reindexing search data");
 				}
 			} else {
-				yiilog('error 123');
+				yiilog($cres);
 				Yii::app()->user->setFlash('error', "Error reloading Solr configuration");
 			}
 		} elseif(isset($_POST['SearchOptionsForm'])) {

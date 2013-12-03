@@ -16,7 +16,7 @@ class BiController extends Controller {
 			/* Nettoyage de toutes les tables */
 			Yii::app()->db->createCommand()->delete('dwh_f_node');
 			Yii::app()->db->createCommand()->delete('dwh_d_host');
-			Yii::app()->db->createCommand()->delete('dwh_d_routeur');
+			Yii::app()->db->createCommand()->delete('dwh_d_router');
 			Yii::app()->db->createCommand()->delete('dwh_d_bios_vendor');
 			Yii::app()->db->createCommand()->delete('dwh_d_bios_release_date');
 			Yii::app()->db->createCommand()->delete('dwh_d_bios_version');
@@ -51,10 +51,10 @@ class BiController extends Controller {
 				Yii::app()->db->createCommand("UPDATE dwh_d_host SET ipaddress_eth0 = '" . $ipaddress_eth0['value'] . "' WHERE certname = '" . $ipaddress_eth0['certname'] . "'")->execute();
 			}
 			/* Routeur dimensions */
-			$routeurs = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'routeur';")->queryColumn();
-			foreach ($routeurs as $routeur) {
-				Yii::app()->db->createCommand()->insert('dwh_d_routeur', array(
-							'routeur' => $routeur,
+			$routers = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'router';")->queryColumn();
+			foreach ($routers as $router) {
+				Yii::app()->db->createCommand()->insert('dwh_d_router', array(
+							'router' => $router,
 							));
 			}
 			/* BIOS dimensions */
@@ -136,12 +136,12 @@ class BiController extends Controller {
 				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $host . "'")->queryScalar();
 				Yii::app()->db->createCommand("INSERT INTO dwh_f_node (host_id) VALUES (" . $id . ")")->execute();
 			}
-			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, value FROM certname_facts WHERE name = 'routeur'")->queryAll();
+			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, value FROM certname_facts WHERE name = 'router'")->queryAll();
 			foreach ($facts as $fact) {
 				$hid = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $fact['certname'] . "'")->queryScalar();
-				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_routeur WHERE routeur = '" . $fact['value'] . "';")->queryScalar();
+				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_router WHERE router = '" . $fact['value'] . "';")->queryScalar();
 				if ($hid && $id) {
-					Yii::app()->db->createCommand("UPDATE dwh_f_node SET routeur_id = " . $id . " WHERE host_id = " . $hid)->execute();
+					Yii::app()->db->createCommand("UPDATE dwh_f_node SET router_id = " . $id . " WHERE host_id = " . $hid)->execute();
 				}
 			}
 			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, value FROM certname_facts WHERE name = 'bios_release_date'")->queryAll();

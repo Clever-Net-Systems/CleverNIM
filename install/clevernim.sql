@@ -470,26 +470,26 @@ LOCK TABLES `dwh_d_regroupement` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `dwh_d_routeur`
+-- Table structure for table `dwh_d_router`
 --
 
-DROP TABLE IF EXISTS `dwh_d_routeur`;
+DROP TABLE IF EXISTS `dwh_d_router`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `dwh_d_routeur` (
+CREATE TABLE `dwh_d_router` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `routeur` varchar(255) NOT NULL,
+  `router` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1571 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `dwh_d_routeur`
+-- Dumping data for table `dwh_d_router`
 --
 
-LOCK TABLES `dwh_d_routeur` WRITE;
-/*!40000 ALTER TABLE `dwh_d_routeur` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dwh_d_routeur` ENABLE KEYS */;
+LOCK TABLES `dwh_d_router` WRITE;
+/*!40000 ALTER TABLE `dwh_d_router` DISABLE KEYS */;
+/*!40000 ALTER TABLE `dwh_d_router` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -576,7 +576,7 @@ DROP TABLE IF EXISTS `dwh_f_node`;
 CREATE TABLE `dwh_f_node` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `host_id` int(11) DEFAULT NULL,
-  `routeur_id` int(11) DEFAULT NULL,
+  `router_id` int(11) DEFAULT NULL,
   `bios_vendor_id` int(11) DEFAULT NULL,
   `bios_release_date_id` int(11) DEFAULT NULL,
   `bios_version_id` int(11) DEFAULT NULL,
@@ -592,7 +592,7 @@ CREATE TABLE `dwh_f_node` (
   `uptime` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `dwh_f_node_fk_host_1` (`host_id`),
-  KEY `dwh_f_node_fk_routeur_1` (`routeur_id`),
+  KEY `dwh_f_node_fk_router_1` (`router_id`),
   KEY `dwh_f_node_fk_bios_vendor_1` (`bios_vendor_id`),
   KEY `dwh_f_node_fk_bios_release_date_1` (`bios_release_date_id`),
   KEY `dwh_f_node_fk_bios_version_1` (`bios_version_id`),
@@ -605,7 +605,7 @@ CREATE TABLE `dwh_f_node` (
   KEY `dwh_f_node_fk_semconfigversions_1` (`semconfigversions_id`),
   KEY `dwh_f_node_fk_product_1` (`product_id`),
   CONSTRAINT `dwh_f_node_fk_host_1` FOREIGN KEY (`host_id`) REFERENCES `dwh_d_host` (`id`),
-  CONSTRAINT `dwh_f_node_fk_routeur_1` FOREIGN KEY (`routeur_id`) REFERENCES `dwh_d_routeur` (`id`),
+  CONSTRAINT `dwh_f_node_fk_router_1` FOREIGN KEY (`router_id`) REFERENCES `dwh_d_router` (`id`),
   CONSTRAINT `dwh_f_node_fk_bios_vendor_1` FOREIGN KEY (`bios_vendor_id`) REFERENCES `dwh_d_bios_vendor` (`id`),
   CONSTRAINT `dwh_f_node_fk_bios_release_date_1` FOREIGN KEY (`bios_release_date_id`) REFERENCES `dwh_d_bios_release_date` (`id`),
   CONSTRAINT `dwh_f_node_fk_bios_version_1` FOREIGN KEY (`bios_version_id`) REFERENCES `dwh_d_bios_version` (`id`),
