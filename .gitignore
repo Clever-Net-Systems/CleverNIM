@@ -1,4 +1,6 @@
 assets/
+!extensions/bootstrap/assets/
+!extensions/x-editable/assets/
 protected/runtime/
 themes/classic/views/
 *.iml
