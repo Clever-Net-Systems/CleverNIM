@@ -10,8 +10,9 @@
 	</bean>
 	<!-- <property name="path" value="file:///var/saiku/saiku-datasources/"/> -->
 
-	<bean id="sessionService" class="org.saiku.web.service.SessionService">
-		<property name="authenticationManager" ref="authenticationManager" />
+	<!-- http://ask.analytical-labs.com/questions/2646/auto-logon-how-to-accomplish -->
+	<bean id="sessionService" class="org.saiku.service.AnonymousSessionService">
+		<!--		<property name="authenticationManager" ref="authenticationManager" />-->
 	</bean>
 
 	<bean id="connectionManager" class="org.saiku.web.impl.SecurityAwareConnectionManager" init-method="init">
