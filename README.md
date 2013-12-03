@@ -31,7 +31,7 @@ node default {
 Your nodes should start to appear in your CleverNIM Web interface (the default admin login is "admin" with password "password").
 
 * Create the following script as /etc/puppet/clevernim and chmod it to 755 (replace "http://clevernim.example.com" with the URL of your Clevernim instance):
-#!/bin/bash
+\#!/bin/bash
 /usr/bin/curl -d certname=$1 http://clevernim.example.com/tag/ENC
 
 * Add the following lines to your puppet.conf in the [master] section and restart Puppet:
