@@ -1,0 +1,16 @@
+<dataConfig>
+	<dataSource name="mysql" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/clevernim" user="clevernim" password="clevernim" batchSize="-1" encoding="UTF-8" />
+	<document>
+		<entity name="node" dataSource="mysql" pk="id" query="SELECT f.id, h.ecole, h.certname, h.ipaddress_eth0, o.osfamily, p.manufacturer, p.type, p.name, r.router FROM dwh_f_node f, dwh_d_host h, dwh_d_osfamily o, dwh_d_product p, dwh_d_router r WHERE f.host_id = h.id AND f.osfamily_id = o.id AND f.product_id = p.id AND f.router_id = r.id;" >
+			<field column="id" name="id" />
+			<field column="ecole" name="ecole" />
+			<field column="certname" name="certname" />
+			<field column="ipaddress_eth0" name="ipaddress_eth0" />
+			<field column="osfamily" name="osfamily" />
+			<field column="manufacturer" name="manufacturer" />
+			<field column="type" name="type" />
+			<field column="name" name="name" />
+			<field column="router" name="router" />
+		</entity>
+	</document>
+</dataConfig>

@@ -50,9 +50,7 @@ Modify saiku/WEB-INF/classes/saiku-datasources/mondrian and point the DB connect
 
 * To setup the software inventory system, deploy the puppet-inventory module in puppet-inventory/ to your nodes. Click on Admin > Generate inventory.
 
-* To setup search with Solr, launch the Solr webapp:
-cd solr/example
-java -jar start.jar
-Edit controllers/SiteController.php and change the URL in functions actionSearch() and actionSearchOptions() to point to your Solr instance
-Edit solr/example/solr/collection1/conf/edupostes_solr.xml and change the URL in the dataSource element to point to your CleverNIM MySQL instance
+* To setup search with Solr, copy the solr/ folder to your Tomcat 7 webapps folder and move the solr subfolder to /var/lib/tomcat7/. You should end up with a solr folder in /var/lib/tomcat7/ and a solr folder in /var/lib/tomcat7/webapps/
+Adjust the DB URL in solr/collection1/conf/clevernim.xml to point to your CleverNIM MySQL instance
+Restart Tomcat
 Click on Admin > Search options > Reindex search database
