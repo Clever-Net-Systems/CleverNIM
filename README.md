@@ -8,13 +8,14 @@ INSTALLATION
 
 * Deploy the contents of the archive in an Apache DocumentRoot
 
-* Create a new MySQL database and import the contents of install/clevernim.sql:
+* Create a new MySQL database and import the contents of install/clevernim.sql and install/dwh.sql:
 
 mysql> create database clevernim;
 mysql> grant all privileges on clevernim.\* to 'clevernim'@'localhost' identified by 'clevernim';
 mysql> flush privileges;
 mysql> use clevernim
 mysql> \. install/clevernim.sql
+mysql> \. install/dwh.sql
 
 * Configure config/main.php to point to your newly created MySQL instance
 * Configure config/main.php to point to your PuppetDB instance

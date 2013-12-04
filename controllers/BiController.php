@@ -14,6 +14,7 @@ class BiController extends Controller {
 		$output = "";
 		if (isset($_POST['yt0']) && ($_POST['yt0'] == "Generation")) {
 			/* Nettoyage de toutes les tables */
+			Yii::app()->db->createCommand()->delete('dwh_f_printer');
 			Yii::app()->db->createCommand()->delete('dwh_f_node');
 			Yii::app()->db->createCommand()->delete('dwh_d_host');
 			Yii::app()->db->createCommand()->delete('dwh_d_router');
@@ -118,6 +119,15 @@ class BiController extends Controller {
 							'majeure' => $semconfigversion['majeure'],
 							'mineure' => $semconfigversion['mineure'],
 							));
+			}
+			/* Printer dimension */
+			$printers = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'printers';")->queryColumn();
+			foreach ($printers as $printer) {
+				foreach (explode(',', $printer) as $p) {
+					Yii::app()->db->createCommand()->insert('dwh_d_printer', array(
+						'printer' => $p,
+					));
+				}
 			}
 			/* Dimension product */
 			$products = Yii::app()->puppetdb->createCommand("SELECT DISTINCT (array_agg(value))[1] AS manufacturer, (array_agg(value))[3] AS type, (array_agg(value))[2] AS name FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'manufacturer' OR name = 'type' OR name = 'productname' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
@@ -234,6 +244,17 @@ class BiController extends Controller {
 					Yii::app()->db->createCommand("UPDATE dwh_f_node SET semconfigversions_id = " . $id . " WHERE host_id = " . $hid)->execute();
 				}
 			}
+			/* Printer */
+			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, value FROM certname_facts WHERE name = 'printers'")->queryAll();
+			foreach ($facts as $fact) {
+				$hid = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $fact['certname'] . "'")->queryScalar();
+				foreach (explode(',', $fact['value']) as $p) {
+					$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_printer WHERE printer = '" . $p . "';")->queryScalar();
+					if ($hid && $id) {
+						Yii::app()->db->createCommand("UPDATE dwh_f_node SET printer_id = " . $id . " WHERE host_id = " . $hid)->execute();
+					}
+				}
+			}
 			/* Product */
 			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, (array_agg(value))[1] AS manufacturer, (array_agg(value))[3] AS type, (array_agg(value))[2] AS name FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'manufacturer' OR name = 'type' OR name = 'productname' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
 			foreach ($facts as $fact) {
@@ -269,6 +290,56 @@ class BiController extends Controller {
 						$uptime = $matches[1] * 60 + $matches[2];
 						Yii::app()->db->createCommand("UPDATE dwh_f_node SET uptime = " . $uptime . " WHERE host_id = " . $hid)->execute();
 					}
+				}
+			}
+			/* Printer Cube */
+			Yii::app()->db->createCommand()->delete('dwh_d_printername');
+			Yii::app()->db->createCommand()->delete('dwh_d_printerdriver');
+			Yii::app()->db->createCommand()->delete('dwh_d_printerlocation');
+			$printernames = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'printernames';")->queryColumn();
+			Yii::app()->db->createCommand()->insert('dwh_d_printername', array('printername' => "Unknown"));
+			foreach ($printernames as $printername) {
+				foreach (explode(' ', $printername) as $p) {
+					Yii::app()->db->createCommand("INSERT INTO dwh_d_printername (printername) VALUES ('" . $p . "') ON DUPLICATE KEY UPDATE printername = VALUES (printername)")->execute();
+				}
+			}
+			$printerdrivers = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'printerdrivers';")->queryColumn();
+			Yii::app()->db->createCommand()->insert('dwh_d_printerdriver', array('printerdriver' => "Unknown"));
+			foreach ($printerdrivers as $printerdriver) {
+				foreach (explode(' ', $printerdriver) as $p) {
+					Yii::app()->db->createCommand("INSERT INTO dwh_d_printerdriver (printerdriver) VALUES ('" . $p . "') ON DUPLICATE KEY UPDATE printerdriver = VALUES (printerdriver)")->execute();
+				}
+			}
+			$printerlocations = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'printerlocations';")->queryColumn();
+			Yii::app()->db->createCommand()->insert('dwh_d_printerlocation', array('printerlocation' => "Unknown"));
+			foreach ($printerlocations as $printerlocation) {
+				foreach (str_getcsv($printerlocation, ' ', '"') as $p) {
+					Yii::app()->db->createCommand("INSERT INTO dwh_d_printerlocation (printerlocation) VALUES ('" . $p . "') ON DUPLICATE KEY UPDATE printerlocation = VALUES (printerlocation)")->execute();
+				}
+			}
+			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, (array_agg(value))[4] AS printernb, (array_agg(value))[3] AS printername, (array_agg(value))[1] AS printerdriver, (array_agg(value))[2] AS printerlocation FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'printernb' OR name = 'printernames' OR name = 'printerdrivers' OR name = 'printerlocations' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
+			foreach ($facts as $fact) {
+				$printernb = $fact['printernb'];
+				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $host . "'")->queryScalar();
+				for ($i = 0; $i < $printernb; $i++) {
+					$printername = $fact['printername'] ? $fact['printername'] : "Unknown";
+					$printername = explode(' ', $printername);
+					$printername = $printername[$i];
+					$nid = Yii::app()->db->createCommand("SELECT id FROM dwh_d_printername WHERE printername = '" . $printername . "'")->queryScalar();
+					$printerdriver = $fact['printerdriver'] ? $fact['printerdriver'] : "Unknown";
+					$printerdriver = explode(' ', $printerdriver);
+					$printerdriver = $printerdriver[$i];
+					$did = Yii::app()->db->createCommand("SELECT id FROM dwh_d_printerdriver WHERE printerdriver = '" . $printerdriver . "'")->queryScalar();
+					$printerlocation = $fact['printerlocation'] ? $fact['printerlocation'] : "Unknown";
+					$printerlocation = str_getcsv($printerlocation, ' ', '"');
+					$printerlocation = $printerlocation[$i];
+					$lid = Yii::app()->db->createCommand("SELECT id FROM dwh_d_printerlocation WHERE printerlocation = '" . $printerlocation . "'")->queryScalar();
+					Yii::app()->db->createCommand()->insert('dwh_f_printer', array(
+						'host_id' => $id,
+						'printername_id' => $nid,
+						'printerdriver_id' => $did,
+						'printerlocation_id' => $lid,
+					));
 				}
 			}
 		}

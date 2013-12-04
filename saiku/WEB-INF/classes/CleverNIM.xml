@@ -1,19 +1,27 @@
 <?xml version="1.0"?>
 <Schema name="Hardware">
+  <Dimension name="Host">
+    <Hierarchy hasAll="true" allMemberName="All hosts" primaryKey="id" defaultMember="All hosts">
+      <Table name="dwh_d_host"/>
+      <Level name="TypeEcole" column="typeecole" uniqueMembers="true" />
+      <Level name="Ecole" column="ecole" uniqueMembers="true" />
+      <Level name="Host" column="certname" uniqueMembers="true" />
+    </Hierarchy>
+  </Dimension>
+  <Dimension name="Environnement">
+    <Hierarchy hasAll="true" allMemberName="Tous les environnements" primaryKey="id" defaultMember="Tous les environnements">
+      <Table name="dwh_d_env"/>
+      <Level name="Environnement" column="env" uniqueMembers="true" />
+    </Hierarchy>
+  </Dimension>
   <Cube name="BIOS" defaultMeasure="Node">
     <Table name="dwh_f_node" />
-    <Dimension name="Host" foreignKey="host_id">
-      <Hierarchy hasAll="true" allMemberName="All hosts" primaryKey="id" defaultMember="All hosts">
-        <Table name="dwh_d_host"/>
-        <Level name="TypeEcole" column="typeecole" uniqueMembers="true" />
-        <Level name="Ecole" column="ecole" uniqueMembers="true" />
-        <Level name="Host" column="certname" uniqueMembers="true" />
-      </Hierarchy>
-    </Dimension>
-    <Dimension name="Routeur" foreignKey="routeur_id">
-      <Hierarchy hasAll="true" allMemberName="Tous les routeurs" primaryKey="id" defaultMember="Tous les routeurs">
-        <Table name="dwh_d_routeur"/>
-        <Level name="Routeur" column="routeur" uniqueMembers="true" />
+    <DimensionUsage name="Host" source="Host" foreignKey="host_id" />
+    <DimensionUsage name="Environnement" source="Environnement" foreignKey="env_id" />
+    <Dimension name="Routeur" foreignKey="router_id">
+      <Hierarchy hasAll="true" allMemberName="All routers" primaryKey="id" defaultMember="All routers">
+        <Table name="dwh_d_router"/>
+        <Level name="Routeur" column="router" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
     <Dimension name="BIOS Vendor" foreignKey="bios_vendor_id">
@@ -46,12 +54,6 @@
         <Level name="Screen1 manufacturer" column="manufacturer" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
-    <Dimension name="Environnement" foreignKey="env_id">
-      <Hierarchy hasAll="true" allMemberName="Tous les environnements" primaryKey="id" defaultMember="Tous les environnements">
-        <Table name="dwh_d_env"/>
-        <Level name="Environnement" column="env" uniqueMembers="true" />
-      </Hierarchy>
-    </Dimension>
     <Dimension name="OS Family" foreignKey="osfamily_id">
       <Hierarchy hasAll="true" allMemberName="All OS families" primaryKey="id" defaultMember="All OS families">
         <Table name="dwh_d_osfamily"/>
@@ -68,6 +70,12 @@
       <Hierarchy hasAll="true" allMemberName="Tous les regroupements" primaryKey="id" defaultMember="Tous les regroupements">
         <Table name="dwh_d_regroupement"/>
         <Level name="Regroupement" column="regroupement" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Printer" foreignKey="printer_id">
+      <Hierarchy hasAll="true" allMemberName="All printers" primaryKey="id" defaultMember="All printers">
+        <Table name="dwh_d_printer"/>
+        <Level name="Printer" column="printer" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
     <Dimension name="Version Config SEM" foreignKey="semconfigversions_id">
@@ -89,5 +97,16 @@
     <Measure name="Node" column="id" aggregator="count" formatString="#,###" caption="Node" />
     <Measure name="Memory" column="memorysize" aggregator="sum" formatString="#,###" caption="Memory size" />
     <Measure name="Uptime" column="uptime" aggregator="avg" formatString="#,###" caption="Uptime" />
+  </Cube>
+  <Cube name="Printers" defaultMeasure="Node">
+    <Table name="dwh_f_printer" />
+    <DimensionUsage name="Host" source="Host" foreignKey="host_id" />
+    <Dimension name="PrinterName" foreignKey="printername_id">
+      <Hierarchy hasAll="true" allMemberName="All printer names" primaryKey="id" defaultMember="All printer names">
+        <Table name="dwh_d_printername"/>
+        <Level name="Printer Name" column="printername" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Measure name="Node" column="id" aggregator="count" formatString="#,###" caption="Node" />
   </Cube>
 </Schema>
