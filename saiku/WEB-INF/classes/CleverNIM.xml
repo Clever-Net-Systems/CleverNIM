@@ -101,10 +101,22 @@
   <Cube name="Printers" defaultMeasure="Node">
     <Table name="dwh_f_printer" />
     <DimensionUsage name="Host" source="Host" foreignKey="host_id" />
-    <Dimension name="PrinterName" foreignKey="printername_id">
+    <Dimension name="Printer Name" foreignKey="printername_id">
       <Hierarchy hasAll="true" allMemberName="All printer names" primaryKey="id" defaultMember="All printer names">
         <Table name="dwh_d_printername"/>
         <Level name="Printer Name" column="printername" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Printer Driver" foreignKey="printerdriver_id">
+      <Hierarchy hasAll="true" allMemberName="All printer drivers" primaryKey="id" defaultMember="All printer drivers">
+        <Table name="dwh_d_printerdriver"/>
+        <Level name="Printer Driver" column="printerdriver" uniqueMembers="true" />
+      </Hierarchy>
+    </Dimension>
+    <Dimension name="Printer Location" foreignKey="printerlocation_id">
+      <Hierarchy hasAll="true" allMemberName="All printer locations" primaryKey="id" defaultMember="All printer locations">
+        <Table name="dwh_d_printerlocation"/>
+        <Level name="Printer Location" column="printerlocation" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
     <Measure name="Node" column="id" aggregator="count" formatString="#,###" caption="Node" />

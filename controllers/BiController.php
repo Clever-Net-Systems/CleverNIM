@@ -120,15 +120,6 @@ class BiController extends Controller {
 							'mineure' => $semconfigversion['mineure'],
 							));
 			}
-			/* Printer dimension */
-			$printers = Yii::app()->puppetdb->createCommand("select DISTINCT value FROM certname_facts WHERE name = 'printers';")->queryColumn();
-			foreach ($printers as $printer) {
-				foreach (explode(',', $printer) as $p) {
-					Yii::app()->db->createCommand()->insert('dwh_d_printer', array(
-						'printer' => $p,
-					));
-				}
-			}
 			/* Dimension product */
 			$products = Yii::app()->puppetdb->createCommand("SELECT DISTINCT (array_agg(value))[1] AS manufacturer, (array_agg(value))[3] AS type, (array_agg(value))[2] AS name FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'manufacturer' OR name = 'type' OR name = 'productname' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
 			foreach ($products as $product) {
@@ -244,17 +235,6 @@ class BiController extends Controller {
 					Yii::app()->db->createCommand("UPDATE dwh_f_node SET semconfigversions_id = " . $id . " WHERE host_id = " . $hid)->execute();
 				}
 			}
-			/* Printer */
-			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, value FROM certname_facts WHERE name = 'printers'")->queryAll();
-			foreach ($facts as $fact) {
-				$hid = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $fact['certname'] . "'")->queryScalar();
-				foreach (explode(',', $fact['value']) as $p) {
-					$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_printer WHERE printer = '" . $p . "';")->queryScalar();
-					if ($hid && $id) {
-						Yii::app()->db->createCommand("UPDATE dwh_f_node SET printer_id = " . $id . " WHERE host_id = " . $hid)->execute();
-					}
-				}
-			}
 			/* Product */
 			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, (array_agg(value))[1] AS manufacturer, (array_agg(value))[3] AS type, (array_agg(value))[2] AS name FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'manufacturer' OR name = 'type' OR name = 'productname' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
 			foreach ($facts as $fact) {
@@ -320,7 +300,7 @@ class BiController extends Controller {
 			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, (array_agg(value))[4] AS printernb, (array_agg(value))[3] AS printername, (array_agg(value))[1] AS printerdriver, (array_agg(value))[2] AS printerlocation FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'printernb' OR name = 'printernames' OR name = 'printerdrivers' OR name = 'printerlocations' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
 			foreach ($facts as $fact) {
 				$printernb = $fact['printernb'];
-				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $host . "'")->queryScalar();
+				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $fact['certname'] . "'")->queryScalar();
 				for ($i = 0; $i < $printernb; $i++) {
 					$printername = $fact['printername'] ? $fact['printername'] : "Unknown";
 					$printername = explode(' ', $printername);
