@@ -2,6 +2,7 @@ assets/
 !extensions/bootstrap/assets/
 !extensions/x-editable/assets/
 !widgets/jqueryFileTree/assets/
+!modules/rights/assets/
 protected/runtime/
 themes/classic/views/
 *.iml
