@@ -24,6 +24,8 @@ class InventaireController extends Controller {
 	}
 
 	public function actionGenerate() {
+		/* Increase max_execution_time */
+		set_time_limit(3600); /* Max 1 hour */
 		$output = "";
 		$nopostecount = 0;
 		$postecount = 0;
