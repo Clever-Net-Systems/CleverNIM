@@ -72,18 +72,12 @@
         <Level name="Regroupement" column="regroupement" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
-    <Dimension name="Printer" foreignKey="printer_id">
-      <Hierarchy hasAll="true" allMemberName="All printers" primaryKey="id" defaultMember="All printers">
-        <Table name="dwh_d_printer"/>
-        <Level name="Printer" column="printer" uniqueMembers="true" />
-      </Hierarchy>
-    </Dimension>
     <Dimension name="Version Config SEM" foreignKey="semconfigversions_id">
       <Hierarchy hasAll="true" allMemberName="Toutes les configs SEM" primaryKey="id" defaultMember="Toutes les configs SEM">
         <Table name="dwh_d_semconfigversions"/>
-        <Level name="Type" column="type" uniqueMembers="true" />
-        <Level name="Majeure" column="majeure" uniqueMembers="true" />
-        <Level name="Mineure" column="mineure" uniqueMembers="true" />
+        <Level name="Type" column="type" uniqueMembers="false" />
+        <Level name="Majeure" column="majeure" uniqueMembers="false" />
+        <Level name="Mineure" column="mineure" uniqueMembers="false" />
       </Hierarchy>
     </Dimension>
     <Dimension name="Product" foreignKey="product_id">

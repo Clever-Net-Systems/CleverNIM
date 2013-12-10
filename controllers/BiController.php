@@ -226,15 +226,6 @@ class BiController extends Controller {
 					Yii::app()->db->createCommand("UPDATE dwh_f_node SET semconfigversions_id = " . $id . " WHERE host_id = " . $hid)->execute();
 				}
 			}
-			/* Versions SEM */
-			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, (array_agg(value))[1] AS type, (array_agg(value))[2] AS majeure, (array_agg(value))[3] AS mineure FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'semconfigversionmajeure' OR name = 'semconfigversionmineure' OR name = 'semconfigtype' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
-			foreach ($facts as $fact) {
-				$hid = Yii::app()->db->createCommand("SELECT id FROM dwh_d_host WHERE certname = '" . $fact['certname'] . "'")->queryScalar();
-				$id = Yii::app()->db->createCommand("SELECT id FROM dwh_d_semconfigversions WHERE type = '" . $fact['type'] . "' AND majeure = '" . $fact['majeure'] . "' AND mineure = '" . $fact['mineure'] . "';")->queryScalar();
-				if ($hid && $id) {
-					Yii::app()->db->createCommand("UPDATE dwh_f_node SET semconfigversions_id = " . $id . " WHERE host_id = " . $hid)->execute();
-				}
-			}
 			/* Product */
 			$facts = Yii::app()->puppetdb->createCommand("SELECT certname, (array_agg(value))[1] AS manufacturer, (array_agg(value))[3] AS type, (array_agg(value))[2] AS name FROM (SELECT certname, name, value FROM certname_facts WHERE name = 'manufacturer' OR name = 'type' OR name = 'productname' ORDER BY certname, name) AS cf GROUP BY certname;")->queryAll();
 			foreach ($facts as $fact) {
