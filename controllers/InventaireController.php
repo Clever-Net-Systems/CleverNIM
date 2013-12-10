@@ -26,6 +26,8 @@ class InventaireController extends Controller {
 	public function actionGenerate() {
 		/* Increase max_execution_time */
 		set_time_limit(3600); /* Max 1 hour */
+		/* Disable index keys */
+		Yii::app()->db->createCommand("ALTER TABLE `inventaire` DISABLE KEYS;")->execute();
 		$output = "";
 		$nopostecount = 0;
 		$postecount = 0;
@@ -60,6 +62,8 @@ class InventaireController extends Controller {
 			}
 			$output = array("$softcount logiciels sur $postecount postes ($nopostecount postes inconnus)");
 		}
+		/* Enable index keys */
+		Yii::app()->db->createCommand("ALTER TABLE `inventaire` ENABLE KEYS;")->execute();
 		$this->render('generate', array('output' => $output));
 	}
 
