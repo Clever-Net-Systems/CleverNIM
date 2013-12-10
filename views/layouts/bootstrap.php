@@ -96,7 +96,6 @@
 								array('label' => 'Media Manager', 'url' => '/mediaManager/'),
 								array('label' => 'Regeneration inventaire', 'url' => '/inventaire/generate'),
 								array('label' => 'Regeneration datawarehouse', 'url' => '/bi/generate'),
-								array('label' => 'Redémarrage Apache', 'url' => '/site/restartapache'),
 								array('label' => 'Synchronisation des manifests', 'url' => '/site/syncmanifests'),
 								array('label' => 'Options de recherche', 'url' => '/site/searchoptions'),
 								'---',
