@@ -18,7 +18,7 @@ $this->breadcrumbs = array(
 	'columns' => array_merge(array(
 		array(
 			'name' => 'host_id',
-			'filter' => Poste::filterData('inventaires'),
+			'filter' => Poste::filterData(),
 			'type' => 'raw',
 			'value' => 'CHtml::link(CHtml::encode($data->host->_intname), array("host/update", "id" => $data->host_id), array("class" => "inventairelistitem", "rel" => "popover", "data-trigger" => "hover", "data-title" => "title", "data-content" => Yii::app()->createUrl("host/coda", array("id" => $data->host_id))))'
 		),
