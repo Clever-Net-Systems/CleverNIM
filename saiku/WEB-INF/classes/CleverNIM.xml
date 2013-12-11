@@ -60,9 +60,8 @@
         <Level name="OS Family" column="osfamily" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
-    <Dimension name="Screens" foreignKey="screens_id">
-      <Hierarchy hasAll="true" allMemberName="All screen counts" primaryKey="id" defaultMember="All screen counts">
-        <Table name="dwh_d_screens"/>
+    <Dimension name="Screens">
+      <Hierarchy hasAll="true" allMemberName="All screen counts" defaultMember="All screen counts">
         <Level name="Screen count" column="screens" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
@@ -83,9 +82,9 @@
     <Dimension name="Product" foreignKey="product_id">
       <Hierarchy hasAll="true" allMemberName="All products" primaryKey="id" defaultMember="All products">
         <Table name="dwh_d_product"/>
-        <Level name="Manufacturer" column="manufacturer" uniqueMembers="true" />
-        <Level name="Type" column="type" uniqueMembers="true" />
-        <Level name="Name" column="name" uniqueMembers="true" />
+        <Level name="Manufacturer" column="manufacturer" uniqueMembers="false" />
+        <Level name="Type" column="type" uniqueMembers="false" />
+        <Level name="Name" column="name" uniqueMembers="false" />
       </Hierarchy>
     </Dimension>
     <Measure name="Node" column="id" aggregator="count" formatString="#,###" caption="Node" />
