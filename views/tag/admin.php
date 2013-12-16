@@ -17,7 +17,7 @@ jQuery().ready(function (){
 ");
 ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller =$this; $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'tag-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $tag->search(),
@@ -32,19 +32,19 @@ jQuery().ready(function (){
 			'name' => 'groupement_id',
 			'filter' => Groupement::filterData('tags'),
 			'type' => 'raw',
-			'value' => 'CHtml::link(CHtml::encode($data->groupement->_intname), array("groupement/update", "id" => $data->groupement_id), array("class" => "taglistitem", "rel" => "popover", "data-trigger" => "hover", "data-title" => "title", "data-content" => Yii::app()->createUrl("groupement/coda", array("id" => $data->groupement_id))))'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.groupement.link1', array('groupement' => $data->groupement), true); }
 		),
 		array(
 			'name' => 'searchpostes',
 			'filter' => null,
 			'type' => 'raw',
-			'value' => '$data->getAllpostess()'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.poste.link', array('postes' => $data->postes), true); }
 		),
 		array(
 			'name' => 'type_de_tag_id',
 			'filter' => Typetag::filterData('tags'),
 			'type' => 'raw',
-			'value' => 'CHtml::image($data->type_de_tag->icone) . "&nbsp;" . CHtml::link(CHtml::encode($data->type_de_tag->_intname), array("typetag/update", "id" => $data->type_de_tag_id), array("class" => "codaPopupTrigger", "rel" => Yii::app()->createUrl("typetag/coda", array("id" => $data->type_de_tag_id))))'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.typetag.link', array('typetag' => $data->type_de_tag), true); }
 		),
 		array(
 			'name' => 'searchvaleurs',

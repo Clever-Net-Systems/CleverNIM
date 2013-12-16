@@ -1,16 +1,55 @@
 <?php
 
 class TagController extends Controller {
+	public $layout = "application.views.layouts.bootstrap";
 	public $adminview = 'application.views.tag.admin';
 	public $createview = 'application.views.tag.create';
 	public $updateview = 'application.views.tag.update';
-	public $codaview = 'application.views.tag.coda';
-	public $layout = "application.views.layouts.bootstrap";
-	public $mergeview = 'application.views.tag.merge';
-	public $exportview = 'application.views.tag.export';
 
 	public function allowedActions() {
-		return 'ENC';
+		return 'ENC'; /* TODO Require login from Puppet */
+	}
+
+	public $defaultAction = 'admin';
+
+	public function filters() {
+		return array(
+			'updateTag + update',
+			'deleteTag + delete',
+			'rights'
+		);
+	}
+
+	public function filterUpdateTag($filterChain) {
+		$this->_filterTag($filterChain, 'Tag.UpdateGroup');
+	}
+
+	public function filterDeleteTag($filterChain) {
+		$this->_filterTag($filterChain, 'Tag.DeleteGroup');
+	}
+
+	/* TODO Ca pete une erreur si on envoie pas id */
+	private function _filterTag($filterChain, $operation) {
+		if (Yii::app()->user->checkAccess($operation)) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$model = $this->loadModel($_GET['id']);
+			/* The user can modify this tag only if he is part of the restriction group and if all associated nodes are in restriction groups that he has access to */
+			if ($user->hasGroup($model->groupement_id)) {
+				$atleastone = false;
+				$ok = true;
+				foreach ($model->postes as $poste) {
+					if ($user->getPosteOK($poste)) {
+						$atleastone = true;
+					} else {
+						$ok = false;
+					}
+				}
+				if ($atleastone && $ok) {
+					$filterChain->removeAt(1);
+				}
+			}
+		}
+		$filterChain->run();
 	}
 
 	/* We can't use yaml_emit() here because we need to be able to have multiple classes with the same name and a PHP associative array will not allow that */
@@ -177,6 +216,7 @@ class TagController extends Controller {
 		));
 	}
 
+	/* TODO Checker si le groupement envoyé est autorisé */
 	public function actionCreate() {
 		$tag = new Tag('create');
 
@@ -189,39 +229,34 @@ class TagController extends Controller {
 		}
 
 		if (isset($_POST['ajax']) && $_POST['ajax'] === 'tag-form') {
-		echo CActiveForm::validate(array($tag));
+			echo CActiveForm::validate(array($tag));
 			Yii::app()->end();
 		}
 
 		if (isset($_POST['Tag'])) {
 			$tag->attributes = $_POST['Tag'];
 			$tag->postes = $tag->postesIds;
-			$valid = true;
-			$valid = $tag->validate() && $valid;
-			if ($valid) {
-				if ($valid && $tag->save(false)) {
-					if (isset($_POST['Valeurparam'])) {
-						foreach ($tag->type_de_tag->parametre as $param) {
-							if (isset($_POST['Valeurparam'][$param->id]) && isset($_POST['Valeurparam'][$param->id]['valeur'])) {
-								$paramvalues[$param->id]->valeur = $_POST['Valeurparam'][$param->id]['valeur'];
-							} else {
-								$paramvalues[$param->id]->valeur = "";
-							}
-							$paramvalues[$param->id]->tag_id = $tag->id;
-							$paramvalues[$param->id]->parametre_id = $param->id;
-							if (!$paramvalues[$param->id]->save()) {
-								yiilog("Erreur dans l'update d'un Valeurparam: " . mergeErrors($paramvalues[$param->id]->getErrors()));
-							}
+			if ($tag->save()) {
+				if (isset($_POST['Valeurparam'])) {
+					foreach ($tag->type_de_tag->parametre as $param) {
+						if (isset($_POST['Valeurparam'][$param->id]) && isset($_POST['Valeurparam'][$param->id]['valeur'])) {
+							$paramvalues[$param->id]->valeur = $_POST['Valeurparam'][$param->id]['valeur'];
+						} else {
+							$paramvalues[$param->id]->valeur = "";
+						}
+						$paramvalues[$param->id]->tag_id = $tag->id;
+						$paramvalues[$param->id]->parametre_id = $param->id;
+						if (!$paramvalues[$param->id]->save()) {
+							yiilog("Erreur dans l'update d'un Valeurparam: " . mergeErrors($paramvalues[$param->id]->getErrors()));
 						}
 					}
-					Yii::app()->user->setFlash('success', Yii::t('app', "Tag " . $tag->_intname . " successfully created."));
-					$this->redirect(array('admin', 'id' => $tag->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Tag object " . $tag->_intname . "."));
-					$valid = false;
 				}
-				// TODO Delete previously created objects if not valid
+				Yii::app()->user->setFlash('success', Yii::t('app', "Tag " . $tag->_intname . " successfully created."));
+				$this->redirect(array('admin', 'id' => $tag->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Tag object " . $tag->_intname . "."));
 			}
+			// TODO Delete previously created objects if not valid
 		}
 
 		$this->render($this->createview, array(
@@ -233,10 +268,7 @@ class TagController extends Controller {
 
 	/* TODO Si on change le type de tag, ça vire pas les valeurparam du type de tag précédent -> a mettre dans Jira */
 	public function actionUpdate($id) {
-		$tag = Tag::model()->findByPk($_GET['id']);
-		if ($tag === null) {
-			throw new CHttpException(404, Yii::t('app', 'Non-existant Tag object.'));
-		}
+		$tag = $this->loadModel($id);
 
 		$paramvalues = array();
 		foreach (Tagparam::model()->findAll() as $param) {
@@ -262,35 +294,30 @@ class TagController extends Controller {
 			} else {
 				$tag->postes = array();
 			}
-			$valid = true;
-			$valid = $tag->validate() && $valid;
-			if ($valid) {
-				if ($valid && $tag->save(false)) {
-					if (isset($_POST['Valeurparam'])) {
-						foreach ($tag->type_de_tag->parametre as $param) {
-							if (isset($_POST['Valeurparam'][$param->id]) && isset($_POST['Valeurparam'][$param->id]['valeur'])) {
-								$paramvalues[$param->id]->valeur = $_POST['Valeurparam'][$param->id]['valeur'];
-							} else {
-								$paramvalues[$param->id]->valeur = "";
-							}
-							$paramvalues[$param->id]->tag_id = $tag->id;
-							$paramvalues[$param->id]->parametre_id = $param->id;
-							if (!$paramvalues[$param->id]->save()) {
-								yiilog($paramvalues[$param->id]->tag_id);
-								yiilog($paramvalues[$param->id]->parametre_id);
-								yiilog($paramvalues[$param->id]->valeur);
-								yiilog("Erreur dans l'update d'un Valeurparam: " . mergeErrors($paramvalues[$param->id]->getErrors()));
-							}
+			if ($tag->save()) {
+				if (isset($_POST['Valeurparam'])) {
+					foreach ($tag->type_de_tag->parametre as $param) {
+						if (isset($_POST['Valeurparam'][$param->id]) && isset($_POST['Valeurparam'][$param->id]['valeur'])) {
+							$paramvalues[$param->id]->valeur = $_POST['Valeurparam'][$param->id]['valeur'];
+						} else {
+							$paramvalues[$param->id]->valeur = "";
+						}
+						$paramvalues[$param->id]->tag_id = $tag->id;
+						$paramvalues[$param->id]->parametre_id = $param->id;
+						if (!$paramvalues[$param->id]->save()) {
+							yiilog($paramvalues[$param->id]->tag_id);
+							yiilog($paramvalues[$param->id]->parametre_id);
+							yiilog($paramvalues[$param->id]->valeur);
+							yiilog("Erreur dans l'update d'un Valeurparam: " . mergeErrors($paramvalues[$param->id]->getErrors()));
 						}
 					}
-					Yii::app()->user->setFlash('success', Yii::t('app', "Tag object " . $tag->_intname . " successfully updated."));
-					$this->redirect(array('admin', 'id' => $tag->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Tag object " . $tag->_intname . "."));
-					$valid = false;
 				}
-				// TODO Delete previously created objects if not valid
+				Yii::app()->user->setFlash('success', Yii::t('app', "Tag object " . $tag->_intname . " successfully updated."));
+				$this->redirect(array('admin', 'id' => $tag->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Tag object " . $tag->_intname . "."));
 			}
+			// TODO Delete previously created objects if not valid
 		}
 
 		$tag->postesIds = Yii::app()->db->createCommand("SELECT postes_id FROM poste_tags WHERE tags_id = :id")->queryColumn(array(":id" => $tag->id));
@@ -299,43 +326,6 @@ class TagController extends Controller {
 			'paramvalues' => $paramvalues,
 			'prevUri' => isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin'),
 		));
-	}
-
-	public function filters() {
-		return array(
-			'updateDeleteSelf + update, delete',
-			'rights'
-		);
-	}
-
-	public function filterUpdateDeleteSelf($filterChain) {
-		$model = $this->loadModel($_GET['id'], 'Tag');
-		if (isset($model->user_id) && Yii::app()->user->checkAccess('Tag.UpdateDeleteSelf', array('userid' => $model->user_id))) {
-			$filterChain->removeAt(1);
-		}
-		$filterChain->run();
-	}
-
-	public $defaultAction = 'admin';
-
-	public function actionCoda() {
-		if (Yii::app()->request->isAjaxRequest && isset($_GET['id'])) {
-			$model = Tag::model()->findByPk($_GET['id']);
-			if ($model) {
-				if (Yii::app()->user->checkAccess("Tag.CodaAll") || (Yii::app()->user->checkAccess("Tag.CodaSelf") && (Yii::app()->user->id == $model->user_id))) {
-					$this->layout = false;
-					$this->render($this->codaview, array(
-						'tag' => $model,
-					));
-				} else {
-					throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
-				}
-			} else {
-				throw new CHttpException(404, Yii::t('app', 'Unknown ID.'));
-			}
-		} else {
-			throw new CHttpException(400, Yii::t('app', 'Invalid request. Please do not repeat this request again.'));
-		}
 	}
 
 	public function loadModel($id) {

@@ -2,7 +2,7 @@
 ?>
 <?php $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'groupement-form',
-	'type' => 'vertical',
+	'type' => 'horizontal',
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
@@ -45,15 +45,15 @@
 
 <?php $faitform = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'fait_groupement-form',
-	'type' => 'inline',
+	'type' => 'horizontal',
 	'action' => Yii::app()->createUrl('fait_groupement/create', array('prevUri' => Yii::app()->request->requestUri)),
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $faitform->errorSummary(array($newfait)); ?>
-	<?php echo $faitform->textFieldRow($newfait, 'fact', array('size' => 60, 'maxlength' => 255, 'hint' => "Le fact Facter")); ?>
-	<?php echo $faitform->dropDownList($newfait, 'operateur', Fait_groupement::getOperateur_values()); ?>
-	<?php echo $faitform->textFieldRow($newfait, 'valeur', array('size' => 60, 'maxlength' => 255, 'hint' => "La valeur du fact")); ?>
+	<?php echo $faitform->textFieldRow($newfait, 'fact', array('size' => 60, 'maxlength' => 255, 'hint' => "The name of the Facter fact")); ?>
+	<?php echo $faitform->dropDownListRow($newfait, 'operateur', Fait_groupement::getOperateur_values(), array('hint' => "The operator to compare the fact and the value")); ?>
+	<?php echo $faitform->textFieldRow($newfait, 'valeur', array('size' => 60, 'maxlength' => 255, 'hint' => "The value of the fact (specify a comma-separated list of values when using the IN operator)")); ?>
 	<?php echo $faitform->hiddenField($newfait, 'groupement_id', array('value' => $newfait->groupement_id)); ?>
 	<?php $this->widget('bootstrap.widgets.TbButton', array('buttonType' => 'submit', 'label' => 'Ajouter')); ?>
 <?php $this->endWidget(); ?>

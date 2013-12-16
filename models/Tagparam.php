@@ -41,17 +41,8 @@ class Tagparam extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'tagparam';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {
@@ -97,9 +88,6 @@ class Tagparam extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Tagparam.ViewAll") && Yii::app()->user->checkAccess('Tagparam.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.nom', $this->nom, true);
 		$criteria->compare('t.description', $this->description, true);
 		$criteria->compare('t.type', $this->type, false);

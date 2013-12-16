@@ -13,7 +13,7 @@ class Tagauto extends EZActiveRecord {
 	public function getAllfaitss() {
 		$ritems = "<div class=\"listbox\">";
 		foreach ($this->faits as $item) {
-			$ritems .= CHtml::link(CHtml::encode($item->_intname), array("fait_tagauto/update", "id" => $item->id), array("class" => "codaPopupTrigger", "rel" => Yii::app()->createUrl("fait_tagauto/coda", array("id" => $item->id)))) . "<br />\n";
+			$ritems .= $item->_intname . "<br />\n";
 		}
 		$ritems .= "</div>";
 		return $ritems;
@@ -35,17 +35,8 @@ class Tagauto extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'tagauto';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {
@@ -88,16 +79,18 @@ class Tagauto extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Tagauto.ViewAll") && Yii::app()->user->checkAccess('Tagauto.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.nom', $this->nom, true);
 		$criteria->compare('t.classe', $this->classe, true);
 		$ids = Yii::app()->db->createCommand("SELECT tag_id FROM fait_tagauto WHERE _intname LIKE :id")->queryColumn(array(":id" => "%" . $this->searchfaits . "%"));
 		if (isset($this->searchfaits) && ($this->searchfaits !== "") && $ids) {
 			$criteria->addInCondition('t.id', $ids);
-		} 
+		}
 		$criteria->compare('t.groupement_id', $this->groupement_id, false);
+		/* Restrict per group if required */
+		if (!Yii::app()->user->checkAccess("AutoTag.Admin") && Yii::app()->user->checkAccess('AutoTag.AdminGroup')) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$criteria->addInCondition('t.groupement_id', $user->getgroupementsIds());
+		}
 
 		return new CActiveDataProvider($this, array(
 			'pagination' => array(

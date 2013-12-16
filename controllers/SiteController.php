@@ -9,6 +9,20 @@ class SiteController extends Controller {
 		return 'index, login, page, novelllogin';
 	}
 
+	public function filters() {
+		return array(
+			'search + search',
+			'rights'
+		);
+	}
+
+	public function filterSearch($filterChain) {
+		if (Yii::app()->user->checkAccess('Site.Search') || Yii::app()->user->checkAccess('Site.SearchGroup')) {
+			$filterChain->removeAt(1);
+		}
+		$filterChain->run();
+	}
+
 	public function actionHome() {
 		$this->render('application.views.site.home');
 	}
@@ -83,15 +97,6 @@ class SiteController extends Controller {
 		$this->render('syncmanifests', array('output' => $output));
 	}
 
-	/**
-	 * Filters
-	 */
-	public function filters() {
-		return array(
-			'rights'
-		);
-	}
-
 	public function actions() {
 		return array(
 			'page' => array(
@@ -144,10 +149,11 @@ class SiteController extends Controller {
 			if ($error !== "") {
 				Yii::app()->user->setFlash('error', "There was an error communicating with the search server: " . $error);
 			} else {
+				$user = User::model()->findByPk(Yii::app()->user->id);
 				foreach ($results as $result) {
 					$certname = $result['certname'];
 					$model = Poste::model()->findByAttributes(array('nom_puppet' => $certname));
-					$objlist[] = array('score' => $result['score'], 'model' => $model ? $model : ($certname . " (non reference dans Edupostes)"));
+					$objlist[] = array('score' => $result['score'], 'model' => $model ? ($user->getPosteOK($model) ? $model : ($certname . " (unauthorized access)")) : ($certname . " (non reference dans Edupostes)"));
 				}
 			}
 		}

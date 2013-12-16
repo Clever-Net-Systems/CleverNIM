@@ -5,7 +5,7 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller = $this; $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'typetag-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $typetag->search(),
@@ -70,7 +70,7 @@ $this->breadcrumbs = array(
 			'name' => 'searchparametre',
 			'filter' => null,
 	 		'type' => 'raw',
-			'value' => '$data->getAllparametres();'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.tagparam.link', array('tagparams' => $data->parametre), true); }
 		),
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',
@@ -99,22 +99,26 @@ $this->breadcrumbs = array(
 
 <?php $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'typetag-form',
-	'type' => 'vertical',
+	'type' => 'horizontal',
 	'action' => Yii::app()->createUrl('typetag/create'),
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $form->errorSummary(array($newtypetag)); ?>
 	<?php echo $form->textFieldRow($newtypetag, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom du tag")); ?>
-	<?php echo $form->labelEx($typetag, 'icone'); ?>
-	<?php $this->widget('application.widgets.jqueryFileTree.jqueryFileTree', array(
-		'name' => 'icone',
-		'form' => $form,
-		'model' => $typetag,
-		'class' => 'Typetag',
-	));
-	?>
-	<?php echo $form->error($typetag, 'icone'); ?>
+	<div class="control-group">
+		<?php echo $form->labelEx($typetag, 'icone', array('class' => 'control-label required')); ?>
+		<div class="controls">
+		<?php $this->widget('application.widgets.jqueryFileTree.jqueryFileTree', array(
+			'name' => 'icone',
+			'form' => $form,
+			'model' => $typetag,
+			'class' => 'Typetag',
+		));
+		?>
+		</div>
+		<?php echo $form->error($typetag, 'icone'); ?>
+	</div>
 	<?php echo $form->textFieldRow($newtypetag, 'classe', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom de la classe Puppet à appliquer")); ?>
 	<?php echo $form->textFieldRow($newtypetag, 'description', array('size' => 60, 'maxlength' => 255, 'hint' => "La description du type de tag")); ?>
 

@@ -75,12 +75,12 @@
 				array(
 					'class'=>'bootstrap.widgets.TbMenu',
 					'items'=> array(
-						array('label'=>'Postes', 'url'=>array('/poste/admin'), 'visible' => Yii::app()->user->checkAccess('Poste_ViewAll')),
-						array('label'=>'Tags', 'url'=>array('/tag/admin'), 'visible' => Yii::app()->user->checkAccess('Tag_ViewAll')),
-						array('label'=>'Tags automatiques', 'url'=>array('/tagauto/admin'), 'visible' => Yii::app()->user->checkAccess('Tagauto_ViewAll')),
-						array('label'=>'Inventaire', 'url'=>array('/inventaire/admin'), 'visible' => Yii::app()->user->checkAccess('Inventaire_ViewAll')),
-						array('label'=>'Types de tags', 'url'=>array('/typetag/admin'), 'visible' => Yii::app()->user->checkAccess('Typetag_ViewAll')),
-						array('label'=>'Groupements', 'url'=>array('/groupement/admin'), 'visible' => Yii::app()->user->checkAccess('Groupement_ViewAll')),
+						array('label'=>'Postes', 'url'=>array('/poste/admin'), 'visible' => Yii::app()->user->checkAccess('Node_ViewAll') || Yii::app()->user->checkAccess('Node_ViewGroup')),
+						array('label'=>'Tags', 'url'=>array('/tag/admin'), 'visible' => Yii::app()->user->checkAccess('Tag_ViewAll') || Yii::app()->user->checkAccess('Tag_ViewGroup')),
+						array('label'=>'Tags automatiques', 'url'=>array('/tagauto/admin'), 'visible' => Yii::app()->user->checkAccess('AutoTag_ViewAll') || Yii::app()->user->checkAccess('AutoTag_ViewGroup')),
+						array('label'=>'Inventaire', 'url'=>array('/inventaire/admin'), 'visible' => Yii::app()->user->checkAccess('Inventory_ViewAll') || Yii::app()->user->checkAccess('Inventory_ViewGroup')),
+						array('label'=>'Types de tags', 'url'=>array('/typetag/admin'), 'visible' => Yii::app()->user->checkAccess('TagType_ViewAll') || Yii::app()->user->checkAccess('TagType_ViewGroup')),
+						array('label'=>'Groupements', 'url'=>array('/groupement/admin'), 'visible' => Yii::app()->user->checkAccess('Group_View')),
 						array('label' => 'Admin', 'url' => '#', 'visible' => Yii::app()->user->checkAccess('AppAdmin'), 'items' => array(
 								array('label' => 'Gestion des utilisateurs', 'url' => '/user/admin'),
 								array('label' => 'Gestion des droits', 'url' => '#', 'items' => array(

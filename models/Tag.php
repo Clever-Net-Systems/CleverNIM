@@ -1,6 +1,26 @@
 <?php
 
 class Tag extends EZActiveRecord {
+	public function userCanModify() {
+		/* The user can modify this tag only if he is part of the restriction group and if all associated nodes are in restriction groups that he has access to */
+		$user = User::model()->findByPk(Yii::app()->user->id);
+		if (in_array($this->groupement->_intname, array_map(function ($p) { return $p->_intname; }, $user->groupements))) {
+			$atleastone = false;
+			$ok = true;
+			foreach ($this->postes as $poste) {
+				if ($user->getPosteOK($poste)) {
+					$atleastone = true;
+				} else {
+					$ok = false;
+				}
+			}
+			if ($atleastone && $ok) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function groupementsOK() {
 		$user = User::model()->findByPk(Yii::app()->user->id);
 		if (count($user->getgroupementsIds()) > 0) {
@@ -13,9 +33,6 @@ class Tag extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Tag.ViewAll") && Yii::app()->user->checkAccess('Tag.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$ids = Yii::app()->db->createCommand("SELECT tag_id FROM valeurparam WHERE _intname LIKE :id")->queryColumn(array(":id" => "%" . $this->searchvaleurs . "%"));
 		if (isset($this->searchvaleurs) && ($this->searchvaleurs !== "") && $ids) {
 			$criteria->addInCondition('t.id', $ids);
@@ -68,7 +85,7 @@ class Tag extends EZActiveRecord {
 	public function getAllvaleurss() {
 		$ritems = "<div class=\"listbox\">";
 		foreach ($this->valeurs as $item) {
-			$ritems .= CHtml::link(CHtml::encode($item->_intname), array("valeurparam/update", "id" => $item->id), array("class" => "codaPopupTrigger", "rel" => Yii::app()->createUrl("valeurparam/coda", array("id" => $item->id)))) . "<br />\n";
+			$ritems .= $item->_intname . "<br />\n";
 		}
 		$ritems .= "</div>";
 		return $ritems;
@@ -91,17 +108,8 @@ class Tag extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'tag';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {

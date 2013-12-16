@@ -22,6 +22,12 @@ $this->breadcrumbs = array(
     			'value'=>'$data->getGridNameLink()',
     		),
     		array(
+    			'name'=>'Tasks',
+    			'header'=>Rights::t('core', 'Tasks'),
+    			'type'=>'raw',
+    			'value'=>'implode("<br />", array_map(function ($t) { return $t->getName(); }, $data->getChildren()))',
+    		),
+    		array(
     			'name'=>'description',
     			'header'=>Rights::t('core', 'Description'),
     			'type'=>'raw',
@@ -52,7 +58,7 @@ $this->breadcrumbs = array(
 	'id' => 'role-form',
 	'type' => 'vertical',
 	'action' => Yii::app()->createUrl('rights/authItem/create', array('type' => CAuthItem::TYPE_ROLE)),
-	'enableAjaxValidation' => true,
+	'enableAjaxValidation' => false,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $form->errorSummary(array($newmodel)); ?>

@@ -44,7 +44,7 @@ class RightsModule extends CWebModule
 	/**
 	* @property boolean whether to enable business rules.
 	*/
-	public $enableBizRule = true;
+	public $enableBizRule = false;
 	/**
 	* @property boolean whether to enable data for business rules.
 	*/

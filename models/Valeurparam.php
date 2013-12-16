@@ -20,22 +20,15 @@ class Valeurparam extends EZActiveRecord {
 
 		return parent::beforeSave();
 	}
+
 	public function beforeDelete() {
 		$this->save();
 
 		return parent::beforeDelete();
 	}
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
 
 	public function tableName() {
 		return 'valeurparam';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {
@@ -68,13 +61,9 @@ class Valeurparam extends EZActiveRecord {
 		);
 	}
 
-	/* TODO compare for subtype */
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Valeurparam.ViewAll") && Yii::app()->user->checkAccess('Valeurparam.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.valeur', $this->valeur, true);
 		$criteria->with[] = "tag";
 		$criteria->together = true;

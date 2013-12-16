@@ -5,46 +5,59 @@ class GroupementController extends Controller {
 	public $createview = 'application.views.groupement.create';
 	public $updateview = 'application.views.groupement.update';
 	public $adminview = 'application.views.groupement.admin';
-	public $codaview = 'application.views.groupement.coda';
-	public $mergeview = 'application.views.groupement.merge';
-	public $exportview = 'application.views.groupement.export';
 
+	/* TODO Temporary until Groupement is renamed to Group */
 	public function filters() {
 		return array(
-			'updateDeleteSelf + update, delete',
-			'rights'
+			'createGroup + create',
+			'deleteGroup + delete',
+			'adminGroup + admin',
+			'exportGroup + export',
+			'updateGroup + update, updateEditable',
 		);
 	}
 
-	public function filterUpdateDeleteSelf($filterChain) {
-		$model = $this->loadModel($_GET['id'], 'Groupement');
-		if (isset($model->user_id) && Yii::app()->user->checkAccess('Groupement.UpdateDeleteSelf', array('userid' => $model->user_id))) {
-			$filterChain->removeAt(1);
+	public function filterCreateGroup($filterChain) {
+		if (Yii::app()->user->checkAccess("Group.Create")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
 		}
-		$filterChain->run();
+	}
+
+	public function filterDeleteGroup($filterChain) {
+		if (Yii::app()->user->checkAccess("Group.Delete")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterAdminGroup($filterChain) {
+		if (Yii::app()->user->checkAccess("Group.Admin")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterExportGroup($filterChain) {
+		if (Yii::app()->user->checkAccess("Group.Export")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterUpdateGroup($filterChain) {
+		if (Yii::app()->user->checkAccess("Group.Update")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
 	}
 
 	public $defaultAction = 'admin';
-
-	public function actionCoda() {
-		if (Yii::app()->request->isAjaxRequest && isset($_GET['id'])) {
-			$model = Groupement::model()->findByPk($_GET['id']);
-			if ($model) {
-				if (Yii::app()->user->checkAccess("Groupement.CodaAll") || (Yii::app()->user->checkAccess("Groupement.CodaSelf") && (Yii::app()->user->id == $model->user_id))) {
-					$this->layout = false;
-					$this->render($this->codaview, array(
-						'groupement' => $model,
-					));
-				} else {
-					throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
-				}
-			} else {
-				throw new CHttpException(404, Yii::t('app', 'Unknown ID.'));
-			}
-		} else {
-			throw new CHttpException(400, Yii::t('app', 'Invalid request. Please do not repeat this request again.'));
-		}
-	}
 
 	public function loadModel($id) {
 		$model = Groupement::model()->findByPk($id);
@@ -58,23 +71,17 @@ class GroupementController extends Controller {
 		$fait = new Fait_groupement('search');
 
 		if (isset($_POST['ajax']) && $_POST['ajax'] === 'groupement-form') {
-		echo CActiveForm::validate(array($groupement));
+			echo CActiveForm::validate(array($groupement));
 			Yii::app()->end();
 		}
 
 		if (isset($_POST['Groupement'])) {
 			$groupement->attributes = $_POST['Groupement'];
-			$valid = true;
-			$valid = $groupement->validate() && $valid;
-			if ($valid) {
-				if ($valid && $groupement->save(false)) {
-					Yii::app()->user->setFlash('success', Yii::t('app', "Groupement " . $groupement->_intname . " successfully created."));
-					$this->redirect(array('admin', 'id' => $groupement->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Groupement object " . $groupement->_intname . "."));
-					$valid = false;
-				}
-				// TODO Delete previously created objects if not valid
+			if ($groupement->save()) {
+				Yii::app()->user->setFlash('success', Yii::t('app', "Groupement " . $groupement->_intname . " successfully created."));
+				$this->redirect(array('admin', 'id' => $groupement->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Groupement object " . $groupement->_intname . "."));
 			}
 		}
 
@@ -102,17 +109,11 @@ class GroupementController extends Controller {
 
 		if (isset($_POST['Groupement'])) {
 			$groupement->attributes = $_POST['Groupement'];
-			$valid = true;
-			$valid = $groupement->validate() && $valid;
-			if ($valid) {
-				if ($valid && $groupement->save(false)) {
-					Yii::app()->user->setFlash('success', Yii::t('app', "Groupement object " . $groupement->_intname . " successfully updated."));
-					$this->redirect(array('admin', 'id' => $groupement->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Groupement object " . $groupement->_intname . "."));
-					$valid = false;
-				}
-				// TODO Delete previously created objects if not valid
+			if ($groupement->save()) {
+				Yii::app()->user->setFlash('success', Yii::t('app', "Groupement object " . $groupement->_intname . " successfully updated."));
+				$this->redirect(array('admin', 'id' => $groupement->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Groupement object " . $groupement->_intname . "."));
 			}
 		}
 

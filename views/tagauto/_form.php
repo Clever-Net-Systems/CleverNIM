@@ -2,15 +2,12 @@
 ?>
 <?php $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'tagauto-form',
-	'type' => 'vertical',
+	'type' => 'horizontal',
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $form->errorSummary(array($tagauto)); ?>
-	<?php echo $form->labelEx($tagauto,'groupement_id'); ?>
-	<?php echo $form->dropDownList($tagauto,"groupement_id", CHtml::listData(Groupement::model()->findAll(array("order" => "_intname")), "id", "_intname")); ?>
-	<?php echo $form->error($tagauto,'groupement_id'); ?>
-	<p class="hint">Groupement de restriction</p>
+	<?php echo $form->dropDownListRow($tagauto,"groupement_id", CHtml::listData(Groupement::model()->findAll(array("order" => "_intname")), "id", "_intname"), array('hint' => "Restriction group")); ?>
 	<?php echo $form->textFieldRow($tagauto, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom du tag automatique")); ?>
 	<?php echo $form->textFieldRow($tagauto, 'classe', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom de la classe Puppet à appliquer")); ?>
 
@@ -49,14 +46,14 @@
 
 <?php $faitform = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'fait_tagauto-form',
-	'type' => 'inline',
+	'type' => 'horizontal',
 	'action' => Yii::app()->createUrl('fait_tagauto/create', array('prevUri' => Yii::app()->request->requestUri)),
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $faitform->errorSummary(array($newfait)); ?>
 	<?php echo $faitform->textFieldRow($newfait, 'fact', array('size' => 60, 'maxlength' => 255, 'hint' => "Le fact Facter")); ?>
-	<?php echo $faitform->dropDownList($newfait, 'operateur', Fait_tagauto::getOperateur_values()); ?>
+	<?php echo $faitform->dropDownListRow($newfait, 'operateur', Fait_tagauto::getOperateur_values(), array('hint' => "The comparison operator")); ?>
 	<?php echo $faitform->textFieldRow($newfait, 'valeur', array('size' => 60, 'maxlength' => 255, 'hint' => "La valeur du fact")); ?>
 	<?php echo $faitform->hiddenField($newfait, 'tag_id', array('value' => $newfait->tag_id)); ?>
 	<?php $this->widget('bootstrap.widgets.TbButton', array('buttonType' => 'submit', 'label' => 'Ajouter')); ?>

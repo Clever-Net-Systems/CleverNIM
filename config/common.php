@@ -253,7 +253,7 @@ return array(
 		),
 		'authManager' => array(
 			'class' => 'RDbAuthManager',
-			'defaultRoles' => array('Guest', 'Authenticated'),
+			'defaultRoles' => array('Authenticated'),
 		),
 		'db' => array(
 			'connectionString' => '###',

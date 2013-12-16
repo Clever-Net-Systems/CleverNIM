@@ -142,6 +142,7 @@ class AuthItemController extends Controller
 	public function actionOperations()
 	{
 		Yii::app()->user->rightsReturnUrl = array('authItem/operations');
+		$newmodel = new AuthItemForm('create');
 		
 		$dataProvider = new RAuthItemDataProvider('operations', array(
 			'type'=>CAuthItem::TYPE_OPERATION,
@@ -155,6 +156,7 @@ class AuthItemController extends Controller
 		// Render the view
 		$this->render('operations', array(
 			'dataProvider'=>$dataProvider,
+			'newmodel' => $newmodel,
 			'isBizRuleEnabled'=>$this->module->enableBizRule,
 			'isBizRuleDataEnabled'=>$this->module->enableBizRuleData,
 		));
@@ -166,6 +168,7 @@ class AuthItemController extends Controller
 	public function actionTasks()
 	{
 		Yii::app()->user->rightsReturnUrl = array('authItem/tasks');
+		$newmodel = new AuthItemForm('create');
 		
 		$dataProvider = new RAuthItemDataProvider('tasks', array(
 			'type'=>CAuthItem::TYPE_TASK,
@@ -179,6 +182,7 @@ class AuthItemController extends Controller
 		// Render the view
 		$this->render('tasks', array(
 			'dataProvider'=>$dataProvider,
+			'newmodel' => $newmodel,
 			'isBizRuleEnabled'=>$this->module->enableBizRule,
 			'isBizRuleDataEnabled'=>$this->module->enableBizRuleData,
 		));

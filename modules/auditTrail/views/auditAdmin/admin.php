@@ -31,7 +31,7 @@ $this->breadcrumbs=array(
 			'name' => 'user_id',
 			'filter' => CHtml::listData(User::model()->findAll(array('order' => 'username')), 'id', 'username'),
 			'type' => 'raw',
-			'value' => '$data->user ? CHtml::link(CHtml::encode($data->user->username), array("user/update", "id" => $data->user_id)) : Yii::t("app", "Visitor")'
+			'value' => '$data->user ? CHtml::encode($data->user->username) : Yii::t("app", "Visitor")'
 		),
 		array(
 			'name' => 'action',

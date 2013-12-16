@@ -2,8 +2,6 @@
 
 class PosteController extends Controller {
 	public $layout = "application.views.layouts.bootstrap";
-	public $codaview = 'application.views.poste.coda';
-	public $mergeview = 'application.views.poste.merge';
 	public $adminview = 'application.views.poste.admin';
 	public $createview = 'application.views.poste.create';
 	public $updateview = 'application.views.poste.update';
@@ -13,27 +11,101 @@ class PosteController extends Controller {
 		return 'ajoutPoste, getPoste, addPoste';
 	}
 
+	public $defaultAction = 'admin';
+
 	public function filters() {
 		return array(
-			'updateDeleteSelf + update, delete',
-			'rights'
+			'adminNode + admin',
+			'updateNode + update, updateEditable',
+			'deleteNode + delete',
+			'kickNode + kick',
+			'VncNode + vnc',
 		);
 	}
 
-	public $defaultAction = 'admin';
-
-	public function filterUpdateDeleteSelf($filterChain) {
-		$model = $this->loadModel($_GET['id'], 'Poste');
-		if (isset($model->user_id) && Yii::app()->user->checkAccess('Poste.UpdateDeleteSelf', array('userid' => $model->user_id))) {
-			$filterChain->removeAt(1);
+	public function filterAdminNode($filterChain) {
+		if (Yii::app()->user->checkAccess('Node.Admin') || Yii::app()->user->checkAccess('Node.AdminGroup')) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
 		}
-		$filterChain->run();
+	}
+
+	public function filterUpdateNode($filterChain) {
+		if (Yii::app()->user->checkAccess('Node.Update')) {
+			$filterChain->run();
+		} elseif (Yii::app()->user->checkAccess("Node.UpdateGroup")) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			if (isset($_POST['pk'])) { // updateEditable request
+				$id = $_POST['pk'];
+			} elseif (isset($_GET['id'])) { // Normal update request
+				$id = $_GET['id'];
+			} else {
+				throw new CHttpException(404, 'Unknown node.');
+			}
+			$model = $this->loadModel($id);
+			if ($user->getPosteOK($model)) {
+				$filterChain->run();
+			} else {
+				throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+			}
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterDeleteNode($filterChain) {
+		if (Yii::app()->user->checkAccess('Node.Delete')) {
+			$filterChain->run();
+		} elseif (Yii::app()->user->checkAccess("Node.DeleteGroup")) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$model = $this->loadModel($_GET['id']);
+			if ($user->getPosteOK($model)) {
+				$filterChain->run();
+			} else {
+				throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+			}
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterKickNode($filterChain) {
+		if (Yii::app()->user->checkAccess('Node.Kick')) {
+			$filterChain->run();
+		} elseif (Yii::app()->user->checkAccess("Node.KickGroup")) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$model = $this->loadModel($_GET['id']);
+			if ($user->getPosteOK($model)) {
+				$filterChain->run();
+			} else {
+				throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+			}
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterVncNode($filterChain) {
+		if (Yii::app()->user->checkAccess('Node.Vnc')) {
+			$filterChain->run();
+		} elseif (Yii::app()->user->checkAccess("Node.VncGroup")) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$model = $this->loadModel($_GET['id']);
+			if ($user->getPosteOK($model)) {
+				$filterChain->run();
+			} else {
+				throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+			}
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
 	}
 
 	public function loadModel($id) {
 		$model = Poste::model()->findByPk($id);
 		if ($model === null)
-			throw new CHttpException(404, 'Le poste demandé n\'existe pas.');
+			throw new CHttpException(404, 'Unknown node.');
 		return $model;
 	}
 
@@ -56,17 +128,11 @@ class PosteController extends Controller {
 			} else {
 				$poste->tags = array();
 			}*/
-			$valid = true;
-			$valid = $poste->validate() && $valid;
-			if ($valid) {
-				if ($valid && $poste->save(false)) {
-					Yii::app()->user->setFlash('success', Yii::t('app', "Poste object " . $poste->_intname . " successfully updated."));
-					$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $poste->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Poste object " . $poste->_intname . "."));
-					$valid = false;
-				}
-				// TODO Delete previously created objects if not valid
+			if ($poste->save()) {
+				Yii::app()->user->setFlash('success', Yii::t('app', "Poste object " . $poste->_intname . " successfully updated."));
+				$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $poste->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Poste object " . $poste->_intname . "."));
 			}
 		}
 
@@ -81,7 +147,7 @@ class PosteController extends Controller {
 		$poste = new Poste('create');
 
 		if (isset($_POST['ajax']) && $_POST['ajax'] === 'poste-form') {
-		echo CActiveForm::validate(array($poste));
+			echo CActiveForm::validate(array($poste));
 			Yii::app()->end();
 		}
 
@@ -89,17 +155,11 @@ class PosteController extends Controller {
 			$poste->attributes = $_POST['Poste'];
 			$poste->tags = $poste->tagsIds;
 			$poste->creation = date("Y-m-d H:i:s");
-			$valid = true;
-			$valid = $poste->validate() && $valid;
-			if ($valid) {
-				if ($valid && $poste->save(false)) {
-					Yii::app()->user->setFlash('success', Yii::t('app', "Poste " . $poste->_intname . " successfully created."));
-					$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $poste->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Poste object " . $poste->_intname . "."));
-					$valid = false;
-				}
-				// TODO Delete previously created objects if not valid
+			if ($poste->save()) {
+				Yii::app()->user->setFlash('success', Yii::t('app', "Poste " . $poste->_intname . " successfully created."));
+				$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $poste->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Poste object " . $poste->_intname . "."));
 			}
 		}
 
@@ -107,26 +167,6 @@ class PosteController extends Controller {
 			'poste' => $poste,
 			'prevUri' => isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin'),
 		));
-	}
-
-	public function actionCoda() {
-		if (Yii::app()->request->isAjaxRequest && isset($_GET['id'])) {
-			$model = Poste::model()->findByPk($_GET['id']);
-			if ($model) {
-				if (Yii::app()->user->checkAccess("Poste.CodaAll") || (Yii::app()->user->checkAccess("Poste.CodaSelf") && (Yii::app()->user->id == $model->user_id))) {
-					$this->layout = false;
-					$this->render($this->codaview, array(
-						'poste' => $model,
-					));
-				} else {
-					throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
-				}
-			} else {
-				throw new CHttpException(404, Yii::t('app', 'Unknown ID.'));
-			}
-		} else {
-			throw new CHttpException(400, Yii::t('app', 'Invalid request. Please do not repeat this request again.'));
-		}
 	}
 
 	public function actionKick() {

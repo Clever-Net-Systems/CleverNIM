@@ -5,7 +5,7 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller = $this; $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'tagauto-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $tagauto->search(),
@@ -13,14 +13,14 @@ $this->breadcrumbs = array(
 	'selectableRows' => 2,
 	'filter' => $tagauto,
 	'emptyText' => Yii::t('app', 'Pas de résultats'),
-	'summaryText' => Yii::t('app', 'Résultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/tagauto/export"><img src="/images/csv.png" alt="CSV Icon"></a.'),
+	'summaryText' => Yii::t('app', 'Résultats {start}-{end} sur {count} (page {page} sur {pages}).&nbsp;<a href="/tagauto/export"><img src="/images/csv.png" alt="CSV Icon"></a>.'),
 	'pager' => array('class' => 'bootstrap.widgets.TbPager', 'prevPageLabel' => Yii::t('app', '< Précédent'), 'nextPageLabel' => Yii::t('app', 'Suivant >')),
 	'columns' => array(
 		array(
 			'name' => 'groupement_id',
 			'filter' => Groupement::filterData('tags_auto'),
 			'type' => 'raw',
-			'value' => 'CHtml::link(CHtml::encode($data->groupement->_intname), array("groupement/update", "id" => $data->groupement_id), array("class" => "codaPopupTrigger", "rel" => Yii::app()->createUrl("groupement/coda", array("id" => $data->groupement_id))))'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.groupement.link1', array('groupement' => $data->groupement), true); }
 		),
 		array(
 			'class' => 'application.extensions.x-editable.EditableColumn',
@@ -81,15 +81,13 @@ $this->breadcrumbs = array(
 
 <?php $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 	'id' => 'newtagauto-form',
-	'type' => 'inline',
+	'type' => 'horizontal',
 	'action' => Yii::app()->createUrl('tagauto/create'),
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $form->errorSummary(array($newtagauto)); ?>
-	<?php echo $form->labelEx($newtagauto,'groupement_id'); ?>
-	<?php echo $form->dropDownList($newtagauto,"groupement_id", CHtml::listData(Groupement::model()->findAll(array("order" => "_intname")), "id", "_intname")); ?>
-	<?php echo $form->error($newtagauto,'groupement_id'); ?>
+	<?php echo $form->dropDownListRow($newtagauto,"groupement_id", CHtml::listData(Groupement::model()->findAll(array("order" => "_intname")), "id", "_intname"), array('hint' => 'The restriction group')); ?>
 	<?php echo $form->textFieldRow($newtagauto, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom du tag automatique")); ?>
 	<?php echo $form->textFieldRow($newtagauto, 'classe', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom de la classe Puppet à appliquer")); ?>
 	<?php $this->widget('bootstrap.widgets.TbButton', array('buttonType' => 'submit', 'label' => 'Ajouter')); ?>

@@ -5,7 +5,7 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller = $this; $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'inventaire-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $inventaire->search(),
@@ -20,7 +20,7 @@ $this->breadcrumbs = array(
 			'name' => 'host_id',
 			'filter' => Poste::filterData('inventaires'),
 			'type' => 'raw',
-			'value' => 'CHtml::link(CHtml::encode($data->host->_intname), array("host/update", "id" => $data->host_id), array("class" => "inventairelistitem", "rel" => "popover", "data-trigger" => "hover", "data-title" => "title", "data-content" => Yii::app()->createUrl("host/coda", array("id" => $data->host_id))))'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.poste.link1', array('poste' => $data->host), true); }
 		),
 	), Inventaire::getFactColumns(), array(
 		array(

@@ -44,17 +44,8 @@ class Fait_groupement extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'fait_groupement';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {
@@ -97,9 +88,6 @@ class Fait_groupement extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Fait_groupement.ViewAll") && Yii::app()->user->checkAccess('Fait_groupement.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.fact', $this->fact, true);
 		$criteria->compare('t.valeur', $this->valeur, true);
 		$criteria->compare('t.operateur', $this->operateur, false);

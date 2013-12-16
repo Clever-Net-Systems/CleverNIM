@@ -5,7 +5,6 @@ class UserController extends Controller {
 	public $adminview = 'application.views.user.admin';
 	public $createview = 'application.views.user.create';
 	public $updateview = 'application.views.user.update';
-	public $codaview = 'application.views.user.coda';
 	public $updateselfview = 'application.views.user.updateself';
 
 	/**
@@ -30,22 +29,6 @@ class UserController extends Controller {
 	 * @var string the default controller action
 	 */
 	public $defaultAction = 'admin';
-
-	public function actionCoda() {
-		if (Yii::app()->request->isAjaxRequest && isset($_GET['id'])) {
-			$user = User::model()->findByPk($_GET['id']);
-			if ($user) {
-				$this->layout = false;
-				$this->render($this->codaview, array(
-					'user'=>$user,
-				));
-			} else {
-				throw new CHttpException(404, 'ID utilisateur inconnu.');
-			}
-		} else {
-			throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
-		}
-	}
 
 	public function actionExport() {
 		$model = new User('search');

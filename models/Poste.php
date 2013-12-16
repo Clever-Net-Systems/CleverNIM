@@ -34,17 +34,8 @@ class Poste extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'poste';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function relations() {
@@ -188,9 +179,6 @@ class Poste extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Poste.ViewAll") && Yii::app()->user->checkAccess('Poste.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.hostname', $this->hostname, true);
 		$criteria->compare('t.routeur', $this->routeur, true);
 		$criteria->compare('t.nom_puppet', $this->nom_puppet, true);
@@ -206,9 +194,11 @@ class Poste extends EZActiveRecord {
 			$criteria->addInCondition('t.nom_puppet', array(null, '', 'semcloner-unset'), 'AND');
 		}
 		/* Restriction par groupement */
-		$user = User::model()->findByPk(Yii::app()->user->id);
-		$postes = $user->getPostesOK();
-		$criteria->addInCondition('t.id', array_map(function ($p) { return $p->id; }, $postes), 'AND');
+		if (!Yii::app()->user->checkAccess("Node.Admin") && Yii::app()->user->checkAccess('Node.AdminGroup')) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$postes = $user->getPostesOK();
+			$criteria->addInCondition('t.id', array_map(function ($p) { return $p->id; }, $postes), 'AND');
+		}
 
 		/* On filtre par puppet facts ajoutes dynamiquement par l'utilisateur */
 		foreach ($this->searchpuppetfacts as $fact => $val) {

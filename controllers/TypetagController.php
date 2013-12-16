@@ -5,9 +5,59 @@ class TypetagController extends Controller {
 	public $adminview = 'application.views.typetag.admin';
 	public $createview = 'application.views.typetag.create';
 	public $updateview = 'application.views.typetag.update';
-	public $codaview = 'application.views.typetag.coda';
-	public $mergeview = 'application.views.typetag.merge';
-	public $exportview = 'application.views.typetag.export';
+
+	public $defaultAction = 'admin';
+
+	/* TODO Temporary until Typetag is renamed to TagType */
+	public function filters() {
+		return array(
+			'createTagType + create',
+			'deleteTagType + delete',
+			'adminTagType + admin',
+			'exportTagType + export',
+			'updateTagType + update, updateEditable',
+		);
+	}
+
+	public function filterCreateTagType($filterChain) {
+		if (Yii::app()->user->checkAccess("TagType.Create")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterDeleteTagType($filterChain) {
+		if (Yii::app()->user->checkAccess("TagType.Delete")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterAdminTagType($filterChain) {
+		if (Yii::app()->user->checkAccess("TagType.Admin")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterExportTagType($filterChain) {
+		if (Yii::app()->user->checkAccess("TagType.Export")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterUpdateTagType($filterChain) {
+		if (Yii::app()->user->checkAccess("TagType.Update")) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
 
 	public function actionExport() {
 		$model = new Typetag('search');
@@ -66,17 +116,11 @@ class TypetagController extends Controller {
 
 		if (isset($_POST['Typetag'])) {
 			$typetag->attributes = $_POST['Typetag'];
-			$valid = true;
-			$valid = $typetag->validate() && $valid;
-			if ($valid) {
-				if ($valid && $typetag->save(false)) {
-					Yii::app()->user->setFlash('success', Yii::t('app', "Typetag object " . $typetag->_intname . " successfully updated."));
-					$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $typetag->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Typetag object " . $typetag->_intname . "."));
-					$valid = false;
-				}
-				// TODO Delete previously created objects if not valid
+			if ($typetag->save()) {
+				Yii::app()->user->setFlash('success', Yii::t('app', "Typetag object " . $typetag->_intname . " successfully updated."));
+				$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $typetag->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error updating Typetag object " . $typetag->_intname . "."));
 			}
 		}
 
@@ -88,64 +132,21 @@ class TypetagController extends Controller {
 		));
 	}
 
-	public function filters() {
-		return array(
-			'updateDeleteSelf + update, delete',
-			'rights'
-		);
-	}
-
-	public function filterUpdateDeleteSelf($filterChain) {
-		$model = $this->loadModel($_GET['id'], 'Typetag');
-		if (isset($model->user_id) && Yii::app()->user->checkAccess('Typetag.UpdateDeleteSelf', array('userid' => $model->user_id))) {
-			$filterChain->removeAt(1);
-		}
-		$filterChain->run();
-	}
-
-	public $defaultAction = 'admin';
-
-	public function actionCoda() {
-		if (Yii::app()->request->isAjaxRequest && isset($_GET['id'])) {
-			$model = Typetag::model()->findByPk($_GET['id']);
-			if ($model) {
-				if (Yii::app()->user->checkAccess("Typetag.CodaAll") || (Yii::app()->user->checkAccess("Typetag.CodaSelf") && (Yii::app()->user->id == $model->user_id))) {
-					$this->layout = false;
-					$this->render($this->codaview, array(
-						'typetag' => $model,
-					));
-				} else {
-					throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
-				}
-			} else {
-				throw new CHttpException(404, Yii::t('app', 'Unknown ID.'));
-			}
-		} else {
-			throw new CHttpException(400, Yii::t('app', 'Invalid request. Please do not repeat this request again.'));
-		}
-	}
-
 	public function actionCreate() {
 		$typetag = new Typetag('create');
 
 		if (isset($_POST['ajax']) && $_POST['ajax'] === 'typetag-form') {
-		echo CActiveForm::validate(array($typetag));
+			echo CActiveForm::validate(array($typetag));
 			Yii::app()->end();
 		}
 
 		if (isset($_POST['Typetag'])) {
 			$typetag->attributes = $_POST['Typetag'];
-			$valid = true;
-			$valid = $typetag->validate() && $valid;
-			if ($valid) {
-				if ($valid && $typetag->save(false)) {
-					Yii::app()->user->setFlash('success', Yii::t('app', "Typetag " . $typetag->_intname . " successfully created."));
-					$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $typetag->id));
-				} else {
-					Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Typetag object " . $typetag->_intname . "."));
-					$valid = false;
-				}
-				// TODO Delete previously created objects if not valid
+			if ($typetag->save()) {
+				Yii::app()->user->setFlash('success', Yii::t('app', "Typetag " . $typetag->_intname . " successfully created."));
+				$this->redirect(isset($_GET['prevUri']) ? $_GET['prevUri'] : array('admin', 'id' => $typetag->id));
+			} else {
+				Yii::app()->user->setFlash('error', Yii::t('app', "Error creating Typetag object " . $typetag->_intname . "."));
 			}
 		}
 

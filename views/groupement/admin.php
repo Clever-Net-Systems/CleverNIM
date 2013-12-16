@@ -5,7 +5,7 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller = $this; $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'groupement-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $groupement->search(),
@@ -32,7 +32,7 @@ $this->breadcrumbs = array(
 			'name' => 'searchfaits',
 			'filter' => null,
 	 		'type' => 'raw',
-			'value' => '$data->getAllfaitss();'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.fait_groupement.link', array('faits' => $data->faits), true); }
 		),
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',
@@ -59,13 +59,13 @@ $this->breadcrumbs = array(
 )); ?>
 
 <?php $groupementform = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
-	'id' => 'fait_groupement-form',
-	'type' => 'inline',
+	'id' => 'groupement-form',
+	'type' => 'horizontal',
 	'action' => Yii::app()->createUrl('groupement/create'),
 	'enableAjaxValidation' => true,
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $groupementform->errorSummary(array($newgroupement)); ?>
-	<?php echo $groupementform->textFieldRow($groupement, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom du groupement")); ?>
+	<?php echo $groupementform->textFieldRow($groupement, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "The name of the group")); ?>
 	<?php $this->widget('bootstrap.widgets.TbButton', array('buttonType' => 'submit', 'label' => 'Ajouter')); ?>
 <?php $this->endWidget(); ?>

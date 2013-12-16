@@ -22,7 +22,7 @@ class Typetag extends EZActiveRecord {
 	public function getAllparametres() {
 		$ritems = "<div class=\"listbox\">";
 		foreach ($this->parametre as $item) {
-			$ritems .= CHtml::link(CHtml::encode($item->_intname), array("tagparam/update", "id" => $item->id), array("class" => "codaPopupTrigger", "rel" => Yii::app()->createUrl("tagparam/coda", array("id" => $item->id)))) . "<br />\n";
+			$ritems .= $item->_intname . "<br />\n";
 		}
 		$ritems .= "</div>";
 		return $ritems;
@@ -44,17 +44,8 @@ class Typetag extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'typetag';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {
@@ -104,9 +95,6 @@ class Typetag extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Typetag.ViewAll") && Yii::app()->user->checkAccess('Typetag.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.nom', $this->nom, true);
 		$criteria->compare('t.classe', $this->classe, true);
 		$criteria->compare('t.description', $this->description, true);

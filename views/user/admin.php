@@ -6,7 +6,7 @@ $this->breadcrumbs=array(
 
 ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller = $this; $this->widget('bootstrap.widgets.TbGridView', array(
 	'id'=>'user-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $model->search(),
@@ -40,7 +40,7 @@ $this->breadcrumbs=array(
 			'name' => 'Groupements',
 			'filter' => false,
 			'type' => 'raw',
-			'value' => '$data->getAllgroupementss()'
+			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.groupement.link', array('groupements' => $data->groupements), true); }
 		),
 		array(
 			'name' => 'createtime',

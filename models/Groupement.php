@@ -54,17 +54,8 @@ class Groupement extends EZActiveRecord {
 		return parent::beforeDelete();
 	}
 
-	public function afterDelete() {
-		return parent::afterDelete();
-	}
-
 	public function tableName() {
 		return 'groupement';
-	}
-
-	public function scopes() {
-		return array(
-		);
 	}
 
 	public function rules() {
@@ -103,9 +94,6 @@ class Groupement extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		if (!Yii::app()->user->checkAccess("Groupement.ViewAll") && Yii::app()->user->checkAccess('Groupement.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}
 		$criteria->compare('t.nom', $this->nom, true);
 		$ids = Yii::app()->db->createCommand("SELECT groupement_id FROM tag WHERE _intname LIKE :id")->queryColumn(array(":id" => "%" . $this->searchtags . "%"));
 		if (isset($this->searchtags) && ($this->searchtags !== "") && $ids) {

@@ -15,6 +15,41 @@ class User extends EZActiveRecord {
 	 */
 
 	/*
+	 * hasGroup() returns whether the user is authorized for a particular group
+	*/
+	public function hasGroup($groupid) {
+		return (in_array($groupid, $this->getgroupementsIds()));
+	}
+
+	/*
+	 * getPosteOK() renvoie si un poste spécifique est gérable par l'utilisateur, en fonction des groupements auxquels il a droit
+	*/
+	public function getPosteOK($poste) {
+		/* Si on est admin, ça passe sans check */
+		if ($this->username === "admin") {
+			return true;
+		}
+		/* Si on est un poste qui n'a pas encore remonté ses facts, ça passe */
+		if (($poste->nom_puppet === null) || ($poste->nom_puppet === "semcloner-unset") || ($poste->nom_puppet === "")) {
+			return true;
+		}
+		$factsarray = $poste->getFacts();
+		$facts = array();
+		foreach ($factsarray as $elem) {
+			$facts[$elem['name']] = $elem['value'];
+		}
+		/* On récupère la liste des groupements du user */
+		$groupements = Groupement::model()->findAllByPk($this->getgroupementsIds());
+		foreach ($groupements as $groupement) {
+			/* Pour chaque groupement, on vérifie si le poste est autorisé */
+			if ($groupement->check($facts)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
 	 * getPostesOK() renvoie la liste des postes qui sont gérables par l'utilisateur, en fonction des groupements auxquels il a droit
 	*/
 	public function getPostesOK() {
@@ -52,6 +87,7 @@ class User extends EZActiveRecord {
 			}
 		}
 		/* On retourne aussi les postes qui n'ont pas encore remonté leurs facts */
+		$postes = array_merge($postes, Poste::model()->findAllByAttributes(array('nom_puppet' => '')));
 		$postes = array_merge($postes, Poste::model()->findAllByAttributes(array('nom_puppet' => null)));
 		$postes = array_merge($postes, Poste::model()->findAllByAttributes(array('nom_puppet' => "semcloner-unset")));
 		return $postes;

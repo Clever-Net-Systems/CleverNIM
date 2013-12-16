@@ -15,11 +15,6 @@ class Inventaire extends EZActiveRecord {
 		return 'inventaire';
 	}
 
-	public function scopes() {
-		return array(
-		);
-	}
-
 	public function relations() {
 		return array(
 			'host' => array(self::BELONGS_TO, 'Poste', 'host_id'),
@@ -77,9 +72,6 @@ class Inventaire extends EZActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-/*		if (!Yii::app()->user->checkAccess("Poste.ViewAll") && Yii::app()->user->checkAccess('Poste.ViewSelf')) {
-			$criteria->compare('t.user_id', Yii::app()->user->id, false);
-		}*/
 		$criteria->compare('t.software', $this->software, true);
 		$criteria->compare('t.version', $this->version, true);
 		$criteria->compare('t.host_id', $this->host_id, false);
