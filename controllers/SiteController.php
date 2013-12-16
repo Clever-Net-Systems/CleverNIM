@@ -75,17 +75,6 @@ class SiteController extends Controller {
 		$this->render('options', array('model' => $model));
 	}
 
-	public function actionRestartapache() {
-		$output = "";
-		if (isset($_POST['yt0']) && ($_POST['yt0'] == "Redémarrer")) {
-			exec("/usr/bin/sudo /usr/local/bin/restart_apache.sh", $output, $errorcode);
-			if ($errorcode != 0) {
-				$output = "<p>Error restarting Apache (code $errorcode)</p>";
-			}
-		}
-		$this->render('restartapache', array('output' => $output));
-	}
-
 	public function actionSyncmanifests() {
 		$output = "";
 		if (isset($_POST['yt0']) && ($_POST['yt0'] == "Synchroniser")) {

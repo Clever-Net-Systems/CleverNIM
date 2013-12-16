@@ -60,9 +60,8 @@
         <Level name="OS Family" column="osfamily" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
-    <Dimension name="Screens" foreignKey="screens_id">
-      <Hierarchy hasAll="true" allMemberName="All screen counts" primaryKey="id" defaultMember="All screen counts">
-        <Table name="dwh_d_screens"/>
+    <Dimension name="Screens">
+      <Hierarchy hasAll="true" allMemberName="All screen counts" defaultMember="All screen counts">
         <Level name="Screen count" column="screens" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
@@ -72,26 +71,20 @@
         <Level name="Regroupement" column="regroupement" uniqueMembers="true" />
       </Hierarchy>
     </Dimension>
-    <Dimension name="Printer" foreignKey="printer_id">
-      <Hierarchy hasAll="true" allMemberName="All printers" primaryKey="id" defaultMember="All printers">
-        <Table name="dwh_d_printer"/>
-        <Level name="Printer" column="printer" uniqueMembers="true" />
-      </Hierarchy>
-    </Dimension>
     <Dimension name="Version Config SEM" foreignKey="semconfigversions_id">
       <Hierarchy hasAll="true" allMemberName="Toutes les configs SEM" primaryKey="id" defaultMember="Toutes les configs SEM">
         <Table name="dwh_d_semconfigversions"/>
-        <Level name="Type" column="type" uniqueMembers="true" />
-        <Level name="Majeure" column="majeure" uniqueMembers="true" />
-        <Level name="Mineure" column="mineure" uniqueMembers="true" />
+        <Level name="Type" column="type" uniqueMembers="false" />
+        <Level name="Majeure" column="majeure" uniqueMembers="false" />
+        <Level name="Mineure" column="mineure" uniqueMembers="false" />
       </Hierarchy>
     </Dimension>
     <Dimension name="Product" foreignKey="product_id">
       <Hierarchy hasAll="true" allMemberName="All products" primaryKey="id" defaultMember="All products">
         <Table name="dwh_d_product"/>
-        <Level name="Manufacturer" column="manufacturer" uniqueMembers="true" />
-        <Level name="Type" column="type" uniqueMembers="true" />
-        <Level name="Name" column="name" uniqueMembers="true" />
+        <Level name="Manufacturer" column="manufacturer" uniqueMembers="false" />
+        <Level name="Type" column="type" uniqueMembers="false" />
+        <Level name="Name" column="name" uniqueMembers="false" />
       </Hierarchy>
     </Dimension>
     <Measure name="Node" column="id" aggregator="count" formatString="#,###" caption="Node" />

@@ -268,29 +268,6 @@ LOCK TABLES `dwh_d_router` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `dwh_d_screens`
---
-
-DROP TABLE IF EXISTS `dwh_d_screens`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `dwh_d_screens` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `screens` int(2) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `dwh_d_screens`
---
-
-LOCK TABLES `dwh_d_screens` WRITE;
-/*!40000 ALTER TABLE `dwh_d_screens` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dwh_d_screens` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `dwh_d_semconfigversions`
 --
 
@@ -359,7 +336,7 @@ CREATE TABLE `dwh_f_node` (
   `manufacturer_screen1_id` int(11) DEFAULT NULL,
   `env_id` int(11) DEFAULT NULL,
   `osfamily_id` int(11) DEFAULT NULL,
-  `screens_id` int(11) DEFAULT NULL,
+  `screens` int(11) DEFAULT 0,
   `regroupement_id` int(11) DEFAULT NULL,
   `semconfigversions_id` int(11) DEFAULT NULL,
   `product_id` int(11) DEFAULT NULL,
@@ -375,7 +352,6 @@ CREATE TABLE `dwh_f_node` (
   KEY `dwh_f_node_fk_manufacturer_screen1_1` (`manufacturer_screen1_id`),
   KEY `dwh_f_node_fk_env_1` (`env_id`),
   KEY `dwh_f_node_fk_osfamily_1` (`osfamily_id`),
-  KEY `dwh_f_node_fk_screens_1` (`screens_id`),
   KEY `dwh_f_node_fk_regroupement_1` (`regroupement_id`),
   KEY `dwh_f_node_fk_semconfigversions_1` (`semconfigversions_id`),
   KEY `dwh_f_node_fk_product_1` (`product_id`),
@@ -388,7 +364,6 @@ CREATE TABLE `dwh_f_node` (
   CONSTRAINT `dwh_f_node_fk_manufacturer_screen1_1` FOREIGN KEY (`manufacturer_screen1_id`) REFERENCES `dwh_d_manufacturer_screen1` (`id`),
   CONSTRAINT `dwh_f_node_fk_env_1` FOREIGN KEY (`env_id`) REFERENCES `dwh_d_env` (`id`),
   CONSTRAINT `dwh_f_node_fk_osfamily_1` FOREIGN KEY (`osfamily_id`) REFERENCES `dwh_d_osfamily` (`id`),
-  CONSTRAINT `dwh_f_node_fk_screens_1` FOREIGN KEY (`screens_id`) REFERENCES `dwh_d_screens` (`id`),
   CONSTRAINT `dwh_f_node_fk_regroupement_1` FOREIGN KEY (`regroupement_id`) REFERENCES `dwh_d_regroupement` (`id`),
   CONSTRAINT `dwh_f_node_fk_semconfigversions_1` FOREIGN KEY (`semconfigversions_id`) REFERENCES `dwh_d_semconfigversions` (`id`),
   CONSTRAINT `dwh_f_node_fk_product_1` FOREIGN KEY (`product_id`) REFERENCES `dwh_d_product` (`id`)

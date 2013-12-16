@@ -18,7 +18,7 @@ $this->breadcrumbs = array(
 	'columns' => array_merge(array(
 		array(
 			'name' => 'host_id',
-			'filter' => Poste::filterData('inventaires'),
+			'filter' => Poste::filterData(),
 			'type' => 'raw',
 			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.poste.link1', array('poste' => $data->host), true); }
 		),
