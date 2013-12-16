@@ -87,7 +87,8 @@ $this->breadcrumbs = array(
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $form->errorSummary(array($newtagauto)); ?>
-	<?php echo $form->dropDownListRow($newtagauto,"groupement_id", CHtml::listData(Groupement::model()->findAll(array("order" => "_intname")), "id", "_intname"), array('hint' => 'The restriction group')); ?>
+	<?php $user = User::model()->findByPk(Yii::app()->user->id); ?>
+	<?php echo $form->dropDownListRow($newtagauto,"groupement_id", CHtml::listData($user->groupements, "id", "_intname"), array('hint' => 'The restriction group')); ?>
 	<?php echo $form->textFieldRow($newtagauto, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom du tag automatique")); ?>
 	<?php echo $form->textFieldRow($newtagauto, 'classe', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom de la classe Puppet à appliquer")); ?>
 	<?php $this->widget('bootstrap.widgets.TbButton', array('buttonType' => 'submit', 'label' => 'Ajouter')); ?>

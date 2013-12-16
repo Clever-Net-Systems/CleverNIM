@@ -7,7 +7,8 @@
 	'htmlOptions' => array('class' => 'well'),
 )); ?>
 	<?php echo $form->errorSummary(array($tagauto)); ?>
-	<?php echo $form->dropDownListRow($tagauto,"groupement_id", CHtml::listData(Groupement::model()->findAll(array("order" => "_intname")), "id", "_intname"), array('hint' => "Restriction group")); ?>
+	<?php $user = User::model()->findByPk(Yii::app()->user->id); ?>
+	<?php echo $form->dropDownListRow($tagauto,"groupement_id", CHtml::listData($user->groupements, "id", "_intname"), array('hint' => "Restriction group")); ?>
 	<?php echo $form->textFieldRow($tagauto, 'nom', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom du tag automatique")); ?>
 	<?php echo $form->textFieldRow($tagauto, 'classe', array('size' => 60, 'maxlength' => 255, 'hint' => "Le nom de la classe Puppet à appliquer")); ?>
 
