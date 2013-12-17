@@ -4,23 +4,38 @@ class InventaireController extends Controller {
 	public $layout = "application.views.layouts.bootstrap";
 	public $adminview = 'application.views.inventaire.admin';
 
-	public function actionGrotest() {
-		/* On nettoie d'abord la table avant de tout reimporter */
-		//Yii::app()->db->createCommand()->delete('inventaire');
-		$output = "";
-		$nopostecount = 0;
-		$postecount = 0;
-		$softcount = 0;
-		if (isset($_POST['yt0']) && ($_POST['yt0'] == "Generation")) {
-			$facts = Yii::app()->puppetdb->createCommand("SELECT DISTINCT name FROM certname_facts")->queryAll();
-			$output = array();
-			$user = User::model()->findByPk(Yii::app()->user->id);
-			foreach ($facts as $fact) {
-				$output[] = $fact['name'];
-			}
-			//$output = array("$softcount logiciels sur $postecount postes ($nopostecount postes inconnus)");
+	public $defaultAction = 'admin';
+
+	public function filters() {
+		return array(
+			'generate + generate',
+			'admin + admin',
+			'export + export',
+		);
+	}
+
+	public function filterAdmin($filterChain) {
+		if (Yii::app()->user->checkAccess('Inventory.Admin') || Yii::app()->user->checkAccess('Inventory.AdminGroup')) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
 		}
-		$this->render('generate', array('output' => $output));
+	}
+
+	public function filterGenerate($filterChain) {
+		if (Yii::app()->user->checkAccess('Inventory.Generate')) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
+	}
+
+	public function filterExport($filterChain) {
+		if (Yii::app()->user->checkAccess('Inventory.Export')) {
+			$filterChain->run();
+		} else {
+			throw new CHttpException(403, Yii::t('app', 'You are not authorized to perform this action.'));
+		}
 	}
 
 	public function actionGenerate() {

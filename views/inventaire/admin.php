@@ -5,7 +5,7 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<?php $controller = $this; $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $controller = $this; $user = User::model()->findByPk(Yii::app()->user->id); $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'inventaire-grid',
 	'type' => 'striped bordered condensed',
 	'dataProvider' => $inventaire->search(),
@@ -18,7 +18,7 @@ $this->breadcrumbs = array(
 	'columns' => array_merge(array(
 		array(
 			'name' => 'host_id',
-			'filter' => Poste::filterData(),
+			'filter' => Yii::app()->user->checkAccess("Inventory.Admin") ? Poste::filterData() : CHtml::listData($user->getPostesOK(), 'id', '_intname'),
 			'type' => 'raw',
 			'value' => function($data, $row) use ($controller) { return $controller->renderPartial('application.views.poste.link1', array('poste' => $data->host), true); }
 		),

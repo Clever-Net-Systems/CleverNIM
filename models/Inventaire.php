@@ -76,6 +76,13 @@ class Inventaire extends EZActiveRecord {
 		$criteria->compare('t.version', $this->version, true);
 		$criteria->compare('t.host_id', $this->host_id, false);
 
+		/* Restriction par groupement */
+		if (!Yii::app()->user->checkAccess("Inventory.Admin") && Yii::app()->user->checkAccess('Inventory.AdminGroup')) {
+			$user = User::model()->findByPk(Yii::app()->user->id);
+			$postes = $user->getPostesOK();
+			$criteria->addInCondition('t.host_id', array_map(function ($p) { return $p->id; }, $postes), 'AND');
+		}
+
 		/* On filtre par puppet facts ajoutes dynamiquement par l'utilisateur */
 		foreach ($this->searchpuppetfacts as $fact => $val) {
 			/* Check if fact is in extraCols because column might have been deleted in the meantime */
