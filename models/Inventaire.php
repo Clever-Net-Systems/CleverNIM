@@ -37,7 +37,7 @@ class Inventaire extends EZActiveRecord {
 			if (in_array($factname, explode(',', Yii::app()->user->getState('extraCols')))) {
 				$res[] = array(
 						'name' => "searchpuppetfacts[$factname]",
-						'header' => "$factname" . '<a href="javascript:$.fn.yiiGridView.update(\'inventaire-grid\', { data:{ delCol: \'' . $factname . '\' } });"><img src=\'/images/cross.png\' alt=\'Supprimer la colonne\'/></a>',
+						'header' => "$factname" . '<a href="javascript:$.fn.yiiGridView.update(\'inventaire-grid\', { data:{ delCol: \'' . $factname . '\' } });"><i class="icon-remove-sign"></i></a>',
 						'filter' => null,
 						'type' => 'raw',
 						'value' => "\$data->host->getFact('$factname');"
