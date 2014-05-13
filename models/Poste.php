@@ -137,7 +137,7 @@ class Poste extends EZActiveRecord {
 			if (in_array($factname, explode(',', Yii::app()->user->getState('extraCols')))) {
 				$res[] = array(
 						'name' => "searchpuppetfacts[$factname]",
-						'header' => "$factname" . '<a href="javascript:$.fn.yiiGridView.update(\'poste-grid\', { data:{ delCol: \'' . $factname . '\' } });"><i class="icon-remove-sign"></i></a>',
+						'header' => "$factname" . '<a href="javascript:$.fn.yiiGridView.update(\'poste-grid\', { data:{ delCol: \'' . $factname . '\', addCol: null } });"><i class="icon-remove-sign"></i></a>',
 						'filter' => null,
 						'type' => 'raw',
 						'value' => "\$data->getFact('$factname');"

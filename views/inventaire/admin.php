@@ -37,7 +37,7 @@ $this->breadcrumbs = array(
 				'addCol',
 				'',
 				array_merge(array('Afficher le fact :' => "Afficher le fact :"), Poste::getFactColumnsList()),
-				array('onchange' => "$.fn.yiiGridView.update('inventaire-grid', { data:{ addCol: $(this).val() } });", 'style' => 'width: 70px; margin-bottom: 0;'))
+				array('onchange' => "$.fn.yiiGridView.update('inventaire-grid', { data:{ addCol: $(this).val(), delCol: null } });", 'style' => 'width: 70px; margin-bottom: 0;'))
 				. CHtml::dropDownList(
 				'pageSize',
 				Yii::app()->user->getState('pageSize', Yii::app()->params['defaultPageSize']),
